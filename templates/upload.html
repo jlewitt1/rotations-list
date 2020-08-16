@@ -15,8 +15,7 @@
             <h4>File Upload</h4>
             <br/>
             <div class="col-md-6">
-                <div>Choose a file in <b>xls</b> or <b>xlsx</b> format</div>
-                <br/>
+                <div style="font-style: italic">Choose a file in xls or xlsx format</div>
                 <form action="https://rotations-beer-sheva.herokuapp.com/results" method="POST"
                       enctype="multipart/form-data">
                     <input type="file" name="file" accept=".xls, .xlsx"/>
@@ -26,6 +25,7 @@
             </div>
             <div class="col-md-6">
                 <div>The format must match something like this:</div>
+                <br/>
                 <img src="{{ sample_image }}" alt="Sample Upload">
             </div>
         </div>
