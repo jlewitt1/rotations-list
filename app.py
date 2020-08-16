@@ -1,8 +1,8 @@
 import numpy as np
 from numpy.random import choice
 import pandas as pd
-from flask import Flask, jsonify, request, make_response, render_template
-from flask_restful import Resource, Api
+from flask import Flask, jsonify, request, render_template
+from flask_restful import Api
 
 app = Flask(__name__)
 api = Api(app)
@@ -58,13 +58,19 @@ def results():
         file_received = request.files['file']
         names, weights = get_names_and_weights(file_received)
         try:
-            final_order = generate_order(names, weights)
-            return jsonify(final_order), 200
+            final_names_order = generate_order(names, weights)
+            return render_template('results.html', names=final_names_order,
+                                   all_data={"names": names, "weights": weights})
         except Exception as e:
             return jsonify(str(e)), 500
 
 
-# a route where we will display a welcome message via an HTML template
+@app.route("/regenerate")
+def regenerate_results(all_data):
+    final_names_order = generate_order(all_data['names'], all_data['weights'])
+    return render_template('results.html', names=final_names_order, all_data=all_data)
+
+
 @app.route("/")
 def hello():
     return render_template('template.html')

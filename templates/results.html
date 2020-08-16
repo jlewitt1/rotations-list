@@ -13,13 +13,16 @@
 <body>
 <div class="container">
     <div class="col-md-12">
-        <h4>Please upload excel file with 2 columns: "Names", "Points"</h4>
+        <h4>Below is the generated selection order:</h4>
         <br/>
-        <form action="https://rotations-beer-sheva.herokuapp.com/results" method="POST"
-              enctype="multipart/form-data">
-            <input type="file" name="file"/>
-            <input type="submit"/>
-        </form>
+        <ul>
+            {% for name in names %}
+            <li>{{loop.counter}}.{{name}}</li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div>Don't believe me? Click <a href="{% url_for('regenerate', all_data=all_data) %}">{{ all_data }} here</a> to
+        regenerate the results
     </div>
 </div>
 </body>
