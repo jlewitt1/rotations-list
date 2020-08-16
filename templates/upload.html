@@ -3,27 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <title>File Upload</title>
-    <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <!-- jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
 <div class="container">
     <div class="col-md-12">
-        <h4>Please upload excel file - the format must match something like this:</h4>
+        <h4>File Upload</h4>
         <br/>
         <div class="col-md-12">
             <div class="col-md-6">
+                <div>Choose a file in <b>xls</b> or <b>xlsx</b> format</div>
                 <form action="https://rotations-beer-sheva.herokuapp.com/results" method="POST"
                       enctype="multipart/form-data">
                     <input type="file" name="file"/>
+                    <br/>
                     <input type="submit"/>
                 </form>
             </div>
             <div class="col-md-6">
+                <div>The format must match something like this:</div>
                 <img src="{{ sample_image }}" alt="Sample Upload">
             </div>
         </div>
