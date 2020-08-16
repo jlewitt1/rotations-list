@@ -36,14 +36,9 @@ def get_names_and_weights(file_received):
     return names, weights
 
 
-def read_file_from_api():
-    file_received = request.files.get('file')
-    return file_received
-
-
 @app.route('/rotations', methods=['POST'])  # VIA API
 def rotations():
-    file_obj = read_file_from_api()
+    file_obj = request.files.get('file')
     names, weights = get_names_and_weights(file_obj)
     try:
         final_order = generate_order(names, weights)
@@ -57,8 +52,8 @@ def upload_file():
     return render_template('upload.html')
 
 
-@app.route('/uploader', methods=['GET', 'POST'])
-def uploader():
+@app.route('/results', methods=['POST'])
+def results():
     if request.method == 'POST':
         file_received = request.files['file']
         names, weights = get_names_and_weights(file_received)

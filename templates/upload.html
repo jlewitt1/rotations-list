@@ -3,9 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>File Upload</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 </head>
 <body>
-<form action="http://localhost:5000/uploader" method="POST"
+<h4>Please upload excel file with 2 columns: "Names", "Points"</h4>
+<br/>
+<form action="https://rotations-beer-sheva.herokuapp.com/results" method="POST"
       enctype="multipart/form-data">
     <input type="file" name="file"/>
     <input type="submit"/>
