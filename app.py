@@ -65,8 +65,10 @@ def results():
             return jsonify(str(e)), 500
 
 
-@app.route("/regenerate")
+@app.route("/regenerate/")
 def regenerate_results(all_data):
+    print("all data received in rengenerate:", all_data)
+    print("type of all data received in rengenerate:", type(all_data))
     final_names_order = generate_order(all_data['names'], all_data['weights'])
     return render_template('results.html', names=final_names_order, all_data=all_data)
 

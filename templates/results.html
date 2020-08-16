@@ -21,8 +21,7 @@
             {% endfor %}
         </ul>
     </div>
-    <div>Don't believe me? Click <a href="{% url_for('regenerate', all_data=all_data) %}">{{ all_data }} here</a> to
-        regenerate the results
+    <div>Don't believe me? Click <a href="/regenerate/{{all_data}}">here</a> to regenerate the results
     </div>
 </div>
 </body>
