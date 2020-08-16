@@ -3,9 +3,13 @@ from numpy.random import choice
 import pandas as pd
 from flask import Flask, jsonify, request, render_template
 from flask_restful import Api
+import os
+
+IMAGES_FOLDER = os.path.join('static', 'images')
 
 app = Flask(__name__)
 api = Api(app)
+app.config['UPLOAD_FOLDER'] = IMAGES_FOLDER
 
 
 def choose_name_randomly(names, p_distribution):
@@ -49,7 +53,8 @@ def rotations():
 
 @app.route('/upload')
 def upload_file():
-    return render_template('upload.html')
+    full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'sample.PNG')
+    return render_template('upload.html', sample_image=full_filename)
 
 
 @app.route('/results', methods=['POST'])
