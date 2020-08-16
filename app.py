@@ -1,7 +1,7 @@
 import numpy as np
 from numpy.random import choice
 import pandas as pd
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, make_response, render_template
 from flask_restful import Resource, Api
 
 app = Flask(__name__)
@@ -37,14 +37,20 @@ def read_excel_file():
     return names, weights
 
 
-@app.route('/rotations', methods=['POST'])
-def add_income():
+@app.route('/rotations', methods=['POST'])  # VIA API
+def rotations():
     names, weights = read_excel_file()
     try:
         final_order = generate_order(names, weights)
         return jsonify(final_order), 200
     except Exception as e:
         return jsonify(str(e)), 500
+
+
+# a route where we will display a welcome message via an HTML template
+@app.route("/")
+def hello():
+    return render_template('template.html')
 
 
 if __name__ == '__main__':
