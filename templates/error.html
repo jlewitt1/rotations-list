@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <title>Results By Date</title>
+    <title>Error</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
@@ -11,14 +11,8 @@
 <div class="container">
     <div class="col-md-12">
         <br/>
-        <div class="col-md-12">
-            <h4>Date Uploaded: {{ date }}</h4>
-            <br/>
-            {{ all_data.to_html(classes="table table-striped") | safe}}
-            <br/>
-        </div>
-        <br/>
-        <div>Click <span><a href="{{ url_for('stats')}}">here</a></span> to go back</div>
+        <h4>There was an error processing the results. Make sure the file is properly formatted</h4>
+        <h5>The error is likely related to: {{ error }}</h5>
     </div>
 </div>
 </body>

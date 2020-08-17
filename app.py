@@ -42,7 +42,7 @@ def results():
     if request.method == 'POST':
         try:
             file_received = request.files['file']
-            rotation_number = request.form.get('date_select')
+            rotation_number = int(request.form.get('rotation_select'))
             df = pd.read_excel(file_received)
             names, weights = get_names_and_weights(df)
             final_names_order = generate_order(names, [weights])
@@ -53,7 +53,7 @@ def results():
                                    all_data={"names": names, "weights": weights})
         except Exception as e:
             print(f"Unable to save data in table: {e}")
-            return jsonify(str(e)), 500
+            return render_template('error.html', error=str(e))
 
 
 @app.route('/stats')
@@ -83,7 +83,7 @@ def rotations():
     all_winners = []
     for idx, date in enumerate(all_dates_for_rotation):
         winner_name = Result.query.filter_by(lottery_id=all_lottery_ids_for_rotation[idx]).order_by(
-            Result.final_ranking.desc()).first().name
+            Result.final_ranking.asc()).first().name
         all_winners.append(winner_name)
     return render_template('rotations.html', rotation=rotation_selected, all_dates=all_dates_for_rotation,
                            all_winners=all_winners)
