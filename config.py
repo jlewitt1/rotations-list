@@ -1,8 +1,6 @@
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-
-os.environ['DATABASE_URL'] = 'postgresql://localhost:5432/rotations'
 ROTATION_NUMBERS = [1, 2, 3, 4, 5]
 
 
