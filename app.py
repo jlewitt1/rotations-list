@@ -3,7 +3,6 @@ import os
 from flask import Flask, jsonify, request, render_template
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
-from utils import *
 from config import ROTATION_NUMBERS
 
 IMAGES_FOLDER = os.path.join('static', 'images')
@@ -15,6 +14,7 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 from models import *
+from utils import *
 
 api = Api(app)
 
