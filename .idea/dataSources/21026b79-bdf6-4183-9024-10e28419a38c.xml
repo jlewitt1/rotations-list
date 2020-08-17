@@ -29,10 +29,12 @@
     <database id="7" parent="1" name="rotations">
       <ObjectId>58183</ObjectId>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>3023</IntrospectionStateNumber>
+      <IntrospectionStateNumber>3057</IntrospectionStateNumber>
       <Current>1</Current>
       <Relations>sequence|table|58189|58191|1
 sequence|table|58197|58199|1
+sequence|table|58208|58210|1
+sequence|table|58221|58223|1
 </Relations>
     </database>
     <database id="8" parent="1" name="suppliers">
@@ -105,7 +107,7 @@ sequence|table|58197|58199|1
       <Comment>standard public schema</Comment>
       <StateNumber>360</StateNumber>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>3024</IntrospectionStateNumber>
+      <IntrospectionStateNumber>3058</IntrospectionStateNumber>
       <Current>1</Current>
     </schema>
     <access-method id="24" parent="7" name="btree">
@@ -180,43 +182,69 @@ sequence|table|58197|58199|1
       <CacheSize>1</CacheSize>
       <DataType>integer</DataType>
     </sequence>
-    <table id="33" parent="23" name="alembic_version">
+    <sequence id="33" parent="23" name="points_id_seq">
+      <ObjectId>58221</ObjectId>
+      <StateNumber>3054</StateNumber>
+      <Owner>jlewittes</Owner>
+      <SequenceIdentity>1</SequenceIdentity>
+      <CacheSize>1</CacheSize>
+      <DataType>integer</DataType>
+    </sequence>
+    <sequence id="34" parent="23" name="user_id_seq">
+      <ObjectId>58208</ObjectId>
+      <StateNumber>3050</StateNumber>
+      <Owner>jlewittes</Owner>
+      <SequenceIdentity>1</SequenceIdentity>
+      <CacheSize>1</CacheSize>
+      <DataType>integer</DataType>
+    </sequence>
+    <table id="35" parent="23" name="alembic_version">
       <ObjectId>58184</ObjectId>
       <Owner>jlewittes</Owner>
       <StateNumber>3021</StateNumber>
     </table>
-    <table id="34" parent="23" name="lottery_overview">
+    <table id="36" parent="23" name="lottery_overview">
       <ObjectId>58191</ObjectId>
       <Owner>jlewittes</Owner>
       <StateNumber>3022</StateNumber>
     </table>
-    <table id="35" parent="23" name="lottery_results">
+    <table id="37" parent="23" name="lottery_results">
       <ObjectId>58199</ObjectId>
       <Owner>jlewittes</Owner>
       <StateNumber>3022</StateNumber>
     </table>
-    <column id="36" parent="33" name="version_num">
+    <table id="38" parent="23" name="points">
+      <ObjectId>58223</ObjectId>
+      <Owner>jlewittes</Owner>
+      <StateNumber>3054</StateNumber>
+    </table>
+    <table id="39" parent="23" name="user">
+      <ObjectId>58210</ObjectId>
+      <Owner>jlewittes</Owner>
+      <StateNumber>3050</StateNumber>
+    </table>
+    <column id="40" parent="35" name="version_num">
       <Position>1</Position>
       <DataType>varchar(32)|0s</DataType>
       <NotNull>1</NotNull>
       <StateNumber>3021</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="37" parent="33" name="alembic_version_pkc">
+    <index id="41" parent="35" name="alembic_version_pkc">
       <ObjectId>58187</ObjectId>
       <StateNumber>3021</StateNumber>
       <ColNames>version_num</ColNames>
       <Unique>1</Unique>
       <Primary>1</Primary>
     </index>
-    <key id="38" parent="33" name="alembic_version_pkc">
+    <key id="42" parent="35" name="alembic_version_pkc">
       <ObjectId>58188</ObjectId>
       <StateNumber>3021</StateNumber>
       <ColNames>version_num</ColNames>
       <Primary>1</Primary>
       <UnderlyingIndexName>alembic_version_pkc</UnderlyingIndexName>
     </key>
-    <column id="39" parent="34" name="id">
+    <column id="43" parent="36" name="id">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
@@ -224,39 +252,39 @@ sequence|table|58197|58199|1
       <DefaultExpression>nextval(&apos;lottery_overview_id_seq&apos;::regclass)</DefaultExpression>
       <TypeId>23</TypeId>
     </column>
-    <column id="40" parent="34" name="lottery_id">
+    <column id="44" parent="36" name="lottery_id">
       <Position>2</Position>
       <DataType>uuid|0s</DataType>
       <StateNumber>3022</StateNumber>
       <TypeId>2950</TypeId>
     </column>
-    <column id="41" parent="34" name="date">
+    <column id="45" parent="36" name="date">
       <Position>3</Position>
       <DataType>timestamp|0s</DataType>
       <StateNumber>3022</StateNumber>
       <TypeId>1114</TypeId>
     </column>
-    <column id="42" parent="34" name="rotation_number">
+    <column id="46" parent="36" name="rotation_number">
       <Position>4</Position>
       <DataType>integer|0s</DataType>
       <StateNumber>3022</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <index id="43" parent="34" name="lottery_overview_pkey">
+    <index id="47" parent="36" name="lottery_overview_pkey">
       <ObjectId>58195</ObjectId>
       <StateNumber>3022</StateNumber>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
       <Primary>1</Primary>
     </index>
-    <key id="44" parent="34" name="lottery_overview_pkey">
+    <key id="48" parent="36" name="lottery_overview_pkey">
       <ObjectId>58196</ObjectId>
       <StateNumber>3022</StateNumber>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
       <UnderlyingIndexName>lottery_overview_pkey</UnderlyingIndexName>
     </key>
-    <column id="45" parent="35" name="id">
+    <column id="49" parent="37" name="id">
       <Position>1</Position>
       <DataType>integer|0s</DataType>
       <NotNull>1</NotNull>
@@ -264,43 +292,165 @@ sequence|table|58197|58199|1
       <DefaultExpression>nextval(&apos;lottery_results_id_seq&apos;::regclass)</DefaultExpression>
       <TypeId>23</TypeId>
     </column>
-    <column id="46" parent="35" name="name">
+    <column id="50" parent="37" name="name">
       <Position>2</Position>
       <DataType>varchar|0s</DataType>
       <StateNumber>3022</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="47" parent="35" name="points">
+    <column id="51" parent="37" name="points">
       <Position>3</Position>
       <DataType>integer|0s</DataType>
       <StateNumber>3022</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="48" parent="35" name="final_ranking">
+    <column id="52" parent="37" name="final_ranking">
       <Position>4</Position>
       <DataType>integer|0s</DataType>
       <StateNumber>3022</StateNumber>
       <TypeId>23</TypeId>
     </column>
-    <column id="49" parent="35" name="lottery_id">
+    <column id="53" parent="37" name="lottery_id">
       <Position>5</Position>
       <DataType>uuid|0s</DataType>
       <StateNumber>3022</StateNumber>
       <TypeId>2950</TypeId>
     </column>
-    <index id="50" parent="35" name="lottery_results_pkey">
+    <index id="54" parent="37" name="lottery_results_pkey">
       <ObjectId>58206</ObjectId>
       <StateNumber>3022</StateNumber>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
       <Primary>1</Primary>
     </index>
-    <key id="51" parent="35" name="lottery_results_pkey">
+    <key id="55" parent="37" name="lottery_results_pkey">
       <ObjectId>58207</ObjectId>
       <StateNumber>3022</StateNumber>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
       <UnderlyingIndexName>lottery_results_pkey</UnderlyingIndexName>
+    </key>
+    <column id="56" parent="38" name="id">
+      <Position>1</Position>
+      <DataType>integer|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>3054</StateNumber>
+      <DefaultExpression>nextval(&apos;points_id_seq&apos;::regclass)</DefaultExpression>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="57" parent="38" name="email">
+      <Position>2</Position>
+      <DataType>varchar(100)|0s</DataType>
+      <StateNumber>3054</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="58" parent="38" name="points_one">
+      <Position>3</Position>
+      <DataType>integer|0s</DataType>
+      <StateNumber>3054</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="59" parent="38" name="points_two">
+      <Position>4</Position>
+      <DataType>integer|0s</DataType>
+      <StateNumber>3054</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="60" parent="38" name="points_three">
+      <Position>5</Position>
+      <DataType>integer|0s</DataType>
+      <StateNumber>3054</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="61" parent="38" name="points_four">
+      <Position>6</Position>
+      <DataType>integer|0s</DataType>
+      <StateNumber>3054</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="62" parent="38" name="points_five">
+      <Position>7</Position>
+      <DataType>integer|0s</DataType>
+      <StateNumber>3054</StateNumber>
+      <TypeId>23</TypeId>
+    </column>
+    <index id="63" parent="38" name="points_pkey">
+      <ObjectId>58227</ObjectId>
+      <StateNumber>3054</StateNumber>
+      <ColNames>id</ColNames>
+      <Unique>1</Unique>
+      <Primary>1</Primary>
+    </index>
+    <index id="64" parent="38" name="points_email_key">
+      <ObjectId>58229</ObjectId>
+      <StateNumber>3054</StateNumber>
+      <ColNames>email</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="65" parent="38" name="points_pkey">
+      <ObjectId>58228</ObjectId>
+      <StateNumber>3054</StateNumber>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>points_pkey</UnderlyingIndexName>
+    </key>
+    <key id="66" parent="38" name="points_email_key">
+      <ObjectId>58230</ObjectId>
+      <StateNumber>3054</StateNumber>
+      <ColNames>email</ColNames>
+      <UnderlyingIndexName>points_email_key</UnderlyingIndexName>
+    </key>
+    <column id="67" parent="39" name="id">
+      <Position>1</Position>
+      <DataType>integer|0s</DataType>
+      <NotNull>1</NotNull>
+      <StateNumber>3050</StateNumber>
+      <DefaultExpression>nextval(&apos;user_id_seq&apos;::regclass)</DefaultExpression>
+      <TypeId>23</TypeId>
+    </column>
+    <column id="68" parent="39" name="email">
+      <Position>2</Position>
+      <DataType>varchar(100)|0s</DataType>
+      <StateNumber>3050</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="69" parent="39" name="password">
+      <Position>3</Position>
+      <DataType>varchar(100)|0s</DataType>
+      <StateNumber>3050</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="70" parent="39" name="name">
+      <Position>4</Position>
+      <DataType>varchar(1000)|0s</DataType>
+      <StateNumber>3050</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="71" parent="39" name="user_pkey">
+      <ObjectId>58217</ObjectId>
+      <StateNumber>3050</StateNumber>
+      <ColNames>id</ColNames>
+      <Unique>1</Unique>
+      <Primary>1</Primary>
+    </index>
+    <index id="72" parent="39" name="user_email_key">
+      <ObjectId>58219</ObjectId>
+      <StateNumber>3050</StateNumber>
+      <ColNames>email</ColNames>
+      <Unique>1</Unique>
+    </index>
+    <key id="73" parent="39" name="user_pkey">
+      <ObjectId>58218</ObjectId>
+      <StateNumber>3050</StateNumber>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+      <UnderlyingIndexName>user_pkey</UnderlyingIndexName>
+    </key>
+    <key id="74" parent="39" name="user_email_key">
+      <ObjectId>58220</ObjectId>
+      <StateNumber>3050</StateNumber>
+      <ColNames>email</ColNames>
+      <UnderlyingIndexName>user_email_key</UnderlyingIndexName>
     </key>
   </database-model>
 </dataSource>

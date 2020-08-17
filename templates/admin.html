@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>File Upload</title>
+    <title>Begin Lottery</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
@@ -12,10 +12,10 @@
     <div class="col-md-12">
         <br/>
         <div class="col-md-12">
-            <h4>File Upload</h4>
+            <h4>Welcome to the Admin Page! Here you can launch a lottery for each rotation</h4>
             <br/>
-            <div class="col-md-6">
-                <form action="/results" method="POST"
+            <div class="col-md-12">
+                <form action="/admin" method="POST"
                       enctype="multipart/form-data">
                     <div class="input-group">
                         <span class="input-group-addon">Select a rotation number</span>
@@ -27,18 +27,9 @@
                     </div>
                     <br/>
                     <br/>
-                    <div style="font-style: italic">Choose a file in xls or xlsx format</div>
-                    <input type="file" name="file" accept=".xls, .xlsx"/>
-                    <br/>
                     <input type="submit"/>
                 </form>
             </div>
-            <div class="col-md-6">
-                <div>The format must match something like this:</div>
-                <br/>
-                <img src="{{ sample_image }}" alt="Sample Upload">
-            </div>
-            <br/>
         </div>
     </div>
 </div>

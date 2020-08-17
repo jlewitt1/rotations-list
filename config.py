@@ -2,6 +2,8 @@ import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 ROTATION_NUMBERS = [1, 2, 3, 4, 5]
+MAX_ALLOCATION_POINTS = 100
+os.environ['DATABASE_URL'] = 'postgresql://localhost:5432/rotations'
 
 
 class Config(object):

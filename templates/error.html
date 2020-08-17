@@ -1,19 +1,6 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Error</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-</head>
-<body>
-<div class="container">
-    <div class="col-md-12">
-        <br/>
-        <h4>There was an error processing the results. Make sure the file is properly formatted</h4>
-        <h5>The error is likely related to: {{ error }}</h5>
-    </div>
-</div>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+    <h4 style="text-align: center">There was an error processing the results</h4>
+    <h5 style="text-align: center">The error is likely related to: {{ error }}</h5>
+{% endblock %}

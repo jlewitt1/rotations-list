@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="col-md-12" style="text-align: left">
+    <h1>Thanks for submitting your points! </h1>
+    <br/>
+    <h4>You can resubmit your point allocations until an official lottery has occurred for that rotation</h4>
+    <br/>
+    <div>Before the admin launches the real lottery feel free to make a trial run to see how it works</div>
+    <br/>
+    <form action="/lottery" method="POST"
+          enctype="multipart/form-data">
+        <div class="input-group">
+            <span class="input-group-addon">Select a rotation number</span>
+            <select name="rotation_select" class="selectpicker form-control">
+                {% for rotation in rotation_numbers %}
+                <option value="{{ rotation }}">{{ rotation }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br/>
+        <br/>
+        <div>Submit to launch the lottery</div>
+        <input type="submit"/>
+    </form>
+    <br/>
+    <div style="font-style: italic">*Note: Results from this trial run will not be saved</div>
+    <br/>
+</div>
+{% endblock %}

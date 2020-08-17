@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">
+    Lottery System
+</h1>
+<h2 class="subtitle">
+    Manage and generate the lottery order for all medical school rotations
+</h2>
+<br/>
+<h5>Powered by <b>Pizza CALDO</b></h5>
+<br/>
+<div>Click <a style="color: blue" href="{{ url_for('stats')}}">here</a> to view stats and results for
+    past lotteries
+</div>
+{% endblock %}

@@ -1,9 +1,11 @@
 import uuid
 import os
-from flask import Flask, jsonify, request, render_template
+from flask import Flask, jsonify, request, render_template, Blueprint
+from flask_login import login_required, current_user
+from flask_login import LoginManager
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
-from config import ROTATION_NUMBERS
+from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS
 
 IMAGES_FOLDER = os.path.join('static', 'images')
 app = Flask(__name__)
@@ -13,10 +15,26 @@ os.environ['APP_SETTINGS'] = "config.DevelopmentConfig"
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+
+login_manager = LoginManager()
+login_manager.login_view = 'auth.login'
+login_manager.init_app(app)
+
 from models import *
 from utils import *
 
 api = Api(app)
+main = Blueprint('main', __name__)
+
+# blueprint for auth routes in our app
+from auth import auth as auth_blueprint
+
+app.register_blueprint(auth_blueprint)
+
+# blueprint for non-auth parts of app
+from main import main as main_blueprint
+
+app.register_blueprint(main_blueprint)
 
 
 @app.route('/rotations_order', methods=['POST'])  # VIA API
@@ -56,11 +74,43 @@ def results():
             return render_template('error.html', error=str(e))
 
 
+@app.route('/admin', methods=['POST'])
+def admin():
+    if request.method == 'POST':
+        try:
+            rotation_number = int(request.form.get('rotation_select'))
+            df = build_dataframe_for_given_rotation(rotation_number)
+            names, weights = get_names_and_weights(df)
+            final_names_order = generate_order(names, [weights])
+            lottery_id = str(uuid.uuid4())
+            save_lottery_drawing_results_in_database(names, weights, final_names_order, lottery_id)
+            save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
+
+            rotations_run, dates_run = generate_data_for_stats_page()
+            return render_template('stats.html', dates=dates_run, rotations=rotations_run)
+        except Exception as e:
+            print(f"Unable to save data in table: {e}")
+            return render_template('error.html', error=str(e))
+
+
+@app.route('/lottery', methods=['POST'])
+def lottery():
+    if request.method == 'POST':
+        try:
+            rotation_number = int(request.form.get('rotation_select'))
+            df = build_dataframe_for_given_rotation(rotation_number)
+            names, weights = get_names_and_weights(df)
+            final_names_order = generate_order(names, [weights])
+            return render_template('results.html', names=final_names_order,
+                                   all_data={"names": names, "weights": weights})
+        except Exception as e:
+            print(f"Unable to save data in table: {e}")
+            return render_template('error.html', error=str(e))
+
+
 @app.route('/stats')
 def stats():
-    results_list = db.session.query(Overview).all()
-    dates_run = [result.date for result in results_list]
-    rotations_run = list(set([result.rotation_number for result in results_list]))
+    rotations_run, dates_run = generate_data_for_stats_page()
     return render_template('stats.html', dates=dates_run, rotations=rotations_run)
 
 
@@ -89,9 +139,35 @@ def rotations():
                            all_winners=all_winners)
 
 
-@app.route("/")
-def home():
-    return render_template('template.html')
+@login_required
+@app.route('/allocations', methods=['POST'])
+def allocations():
+    res = dict(request.form)  # {rotation_number : points}
+    allocations_list = [int(vv) for kk, vv in res.items()]
+    total_sum = sum(allocations_list)
+    if total_sum > MAX_ALLOCATION_POINTS:
+        return render_template('error.html',
+                               error="The total points allotted ({}) must not exceed {}".format(total_sum,
+                                                                                                MAX_ALLOCATION_POINTS))
+    else:
+        save_points_for_given_user(current_user.email, allocations_list)
+        return render_template('summary.html', rotation_numbers=ROTATION_NUMBERS, name=current_user.name)
+
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+
+@app.route('/profile')
+def profile():
+    return render_template('profile.html')
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    # since the user_id is just the primary key of our user table, use it in the query for the user
+    return User.query.get(int(user_id))
 
 
 if __name__ == '__main__':
