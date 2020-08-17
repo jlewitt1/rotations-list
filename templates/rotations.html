@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Results By Rotation</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<div class="container">
+    <div class="col-md-12">
+        <br/>
+        <div class="col-md-12">
+            <h4>Rotation Selected: {{ rotation }}</h4>
+            <br/>
+            <div class="results-holder">
+                <div>Lottery winners from each upload:</div>
+                <br/>
+                <ul style="list-style: none;">
+                    {% for date in all_dates %}
+                    <li>{{ date }}: <b>{{ all_winners[loop.index - 1] }}</b></li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <br/>
+        </div>
+        <br/>
+        <div>Click <span><a href="{{ url_for('stats')}}">here</a></span> to go back</div>
+    </div>
+</div>
+</body>
+</html>

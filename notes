@@ -1,0 +1,7 @@
+POSTGRES
+database: postgres
+user: admin
+pwd: admin
+-localhost
+
+CREATE ROLE jlewittes SUPERUSER LOGIN PASSWORD 'admin';

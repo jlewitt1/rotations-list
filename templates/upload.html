@@ -15,9 +15,19 @@
             <h4>File Upload</h4>
             <br/>
             <div class="col-md-6">
-                <div style="font-style: italic">Choose a file in xls or xlsx format</div>
-                <form action="https://rotations-beer-sheva.herokuapp.com/results" method="POST"
+                <form action="/results" method="POST"
                       enctype="multipart/form-data">
+                    <div class="input-group">
+                        <span class="input-group-addon">Select a rotation number</span>
+                        <select name="rotation_select" class="selectpicker form-control">
+                            {% for rotation in rotation_numbers %}
+                            <option value="{{ rotation }}">{{ rotation }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br/>
+                    <br/>
+                    <div style="font-style: italic">Choose a file in xls or xlsx format</div>
                     <input type="file" name="file" accept=".xls, .xlsx"/>
                     <br/>
                     <input type="submit"/>
@@ -28,10 +38,8 @@
                 <br/>
                 <img src="{{ sample_image }}" alt="Sample Upload">
             </div>
+            <br/>
         </div>
-        <br/>
-
     </div>
-</div>
 </body>
 </html>

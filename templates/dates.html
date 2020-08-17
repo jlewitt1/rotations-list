@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Selection Results</title>
+    <title>Results By Date</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
@@ -11,18 +11,14 @@
 <div class="container">
     <div class="col-md-12">
         <br/>
-        <h4>Generated selection order:</h4>
+        <div class="col-md-12">
+            <h4>Date Selected: {{ date }}</h4>
+            <br/>
+            {{ all_data.to_html(classes="table table-striped") | safe}}
+            <br/>
+        </div>
         <br/>
-        <ul style="list-style: none;">
-            {% for name in names %}
-            <li>{{loop.index}}. {{name}}</li>
-            {% endfor %}
-        </ul>
-    </div>
-    <div>Don't believe me? Click <a href="{{ url_for('upload_file')}}">here</a></span> to try again
-    </div>
-    <br/>
-    <div>Click <a href="{{ url_for('stats')}}">here</a> to view stats and results for past rotations
+        <div>Click <span><a href="{{ url_for('stats')}}">here</a></span> to go back</div>
     </div>
 </div>
 </body>
