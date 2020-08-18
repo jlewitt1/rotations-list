@@ -181,6 +181,7 @@ class MyView(BaseView):
     #     return current_user.is_authenticated()
     #
 
+
 if __name__ == '__main__':
     admin = Admin(app)
     admin.add_view(ModelView(models.User, db.session))
