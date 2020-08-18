@@ -85,8 +85,32 @@ def get_name_from_email(email):
     return db.session.query(models.User).filter_by(email=email).first().name
 
 
+def get_email_from_name(name):
+    return db.session.query(models.User).filter_by(name=name).first().email
+
+
+def save_points_for_given_lottery(names, weights, rotation_number):
+    for idx, name in enumerate(names):
+        try:
+            email = get_email_from_name(name)
+        except Exception as e:
+            print(f"{name} not found in table")
+
+        if rotation_number == 1:
+            points_obj = models.Points(email=email, points_one=weights[idx])
+        elif rotation_number == 2:
+            points_obj = models.Points(email=email, points_two=weights[idx])
+        elif rotation_number == 3:
+            points_obj = models.Points(email=email, points_three=weights[idx])
+        elif rotation_number == 4:
+            points_obj = models.Points(email=email, points_four=weights[idx])
+        else:
+            points_obj = models.Points(email=email, points_five=weights[idx])
+        db.session.add(points_obj)
+    db.session.commit()
+
+
 def build_dataframe_for_given_rotation(rotation_number):
-    res = []
     if rotation_number == 1:
         result = db.session.query(models.Points.email, models.Points.points_one)
         res = [{"Name": get_name_from_email(user.email), "Points": user.points_one} for user in result]
@@ -99,7 +123,7 @@ def build_dataframe_for_given_rotation(rotation_number):
     elif rotation_number == 4:
         result = db.session.query(models.Points.email, models.Points.points_four)
         res = [{"Name": get_name_from_email(user.email), "Points": user.points_four} for user in result]
-    elif rotation_number == 5:
+    else:
         result = db.session.query(models.Points.email, models.Points.points_five)
         res = [{"Name": get_name_from_email(user.email), "Points": user.points_five} for user in result]
 

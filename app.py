@@ -65,6 +65,7 @@ def results():
             lottery_id = str(uuid.uuid4())
             utils.save_lottery_drawing_results_in_database(names, weights, final_names_order, lottery_id)
             utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
+            utils.save_points_for_given_lottery(names, weights, rotation_number)
             return render_template('results.html', names=final_names_order,
                                    all_data={"names": names, "weights": weights})
         except Exception as e:
