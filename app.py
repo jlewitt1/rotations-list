@@ -2,11 +2,11 @@ import uuid
 import os
 from flask import Flask, jsonify, request, render_template, Blueprint
 from flask_login import LoginManager, login_required, current_user
-from flask_admin import Admin, BaseView, expose, AdminIndexView
+from flask_admin import Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
-from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS
+import pandas as pd
 
 IMAGES_FOLDER = os.path.join('static', 'images')
 app = Flask(__name__)
@@ -21,30 +21,35 @@ login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
 
-from models import *
-from utils import *
 
-api = Api(app)
-main = Blueprint('main', __name__)
+class MyView(BaseView):
+    @expose('/')
+    def index(self):
+        return self.render('admin.html', rotation_numbers=ROTATION_NUMBERS)
 
-# blueprint for auth routes in our app
+
 from auth import auth as auth_blueprint
-
-app.register_blueprint(auth_blueprint)
-
-# blueprint for non-auth parts of app
 from main import main as main_blueprint
+import models
 
+main = Blueprint('main', __name__)
+app.register_blueprint(auth_blueprint)
 app.register_blueprint(main_blueprint)
+
+admin = Admin(app)
+admin.add_view(ModelView(models.User, db.session))
+admin.add_view(MyView(name='Lottery', endpoint='lottery'))
+
+import utils
 
 
 @app.route('/rotations_order', methods=['POST'])  # VIA API
 def rotations_order():
     file_obj = request.files.get('file')
     df = pd.read_excel(file_obj)
-    names, weights = get_names_and_weights(df)
+    names, weights = utils.get_names_and_weights(df)
     try:
-        final_order = generate_order(names, [weights])
+        final_order = utils.generate_order(names, [weights])
         return jsonify(final_order), 200
     except Exception as e:
         return jsonify(str(e)), 500
@@ -63,11 +68,11 @@ def results():
             file_received = request.files['file']
             rotation_number = int(request.form.get('rotation_select'))
             df = pd.read_excel(file_received)
-            names, weights = get_names_and_weights(df)
-            final_names_order = generate_order(names, [weights])
+            names, weights = utils.get_names_and_weights(df)
+            final_names_order = utils.generate_order(names, [weights])
             lottery_id = str(uuid.uuid4())
-            save_lottery_drawing_results_in_database(names, weights, final_names_order, lottery_id)
-            save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
+            utils.save_lottery_drawing_results_in_database(names, weights, final_names_order, lottery_id)
+            utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
             return render_template('results.html', names=final_names_order,
                                    all_data={"names": names, "weights": weights})
         except Exception as e:
@@ -80,14 +85,14 @@ def admin_lottery():
     if request.method == 'POST':
         try:
             rotation_number = int(request.form.get('rotation_select'))
-            df = build_dataframe_for_given_rotation(rotation_number)
-            names, weights = get_names_and_weights(df)
-            final_names_order = generate_order(names, [weights])
+            df = utils.build_dataframe_for_given_rotation(rotation_number)
+            names, weights = utils.get_names_and_weights(df)
+            final_names_order = utils.generate_order(names, [weights])
             lottery_id = str(uuid.uuid4())
-            save_lottery_drawing_results_in_database(names, weights, final_names_order, lottery_id)
-            save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
+            utils.save_lottery_drawing_results_in_database(names, weights, final_names_order, lottery_id)
+            utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
 
-            dates_run, rotations_run = generate_data_for_stats_page()
+            dates_run, rotations_run = utils.generate_data_for_stats_page()
             return render_template('stats.html', dates=dates_run, rotations=rotations_run)
         except Exception as e:
             print(f"Unable to save data in table: {e}")
@@ -99,9 +104,9 @@ def lottery():
     if request.method == 'POST':
         try:
             rotation_number = int(request.form.get('rotation_select'))
-            df = build_dataframe_for_given_rotation(rotation_number)
-            names, weights = get_names_and_weights(df)
-            final_names_order = generate_order(names, [weights])
+            df = utils.build_dataframe_for_given_rotation(rotation_number)
+            names, weights = utils.get_names_and_weights(df)
+            final_names_order = utils.generate_order(names, [weights])
             return render_template('results.html', names=final_names_order,
                                    all_data={"names": names, "weights": weights})
         except Exception as e:
@@ -111,30 +116,30 @@ def lottery():
 
 @app.route('/stats')
 def stats():
-    dates_run, rotations_run = generate_data_for_stats_page()
+    dates_run, rotations_run = utils.generate_data_for_stats_page()
     return render_template('stats.html', dates=dates_run, rotations=rotations_run)
 
 
 @app.route("/dates", methods=['GET', 'POST'])
 def dates():
     date_selected = request.form.get('date_select')
-    lottery_id = db.session.query(Overview).filter_by(date=date_selected).first().lottery_id
-    data_for_date_selected = db.session.query(Result).filter_by(lottery_id=lottery_id)
-    df = build_final_dataframe_for_page(data_for_date_selected)
+    lottery_id = db.session.query(models.Overview).filter_by(date=date_selected).first().lottery_id
+    data_for_date_selected = db.session.query(models.Result).filter_by(lottery_id=lottery_id)
+    df = utils.build_final_dataframe_for_page(data_for_date_selected)
     return render_template('dates.html', date=date_selected, all_data=df)
 
 
 @app.route("/rotations", methods=['GET', 'POST'])
 def rotations():
     rotation_selected = request.form.get('rotation_select')
-    data_for_rotation_selected = db.session.query(Overview).filter_by(rotation_number=int(rotation_selected))
+    data_for_rotation_selected = db.session.query(models.Overview).filter_by(rotation_number=int(rotation_selected))
     all_dates_for_rotation = [data.date for data in data_for_rotation_selected]
     all_lottery_ids_for_rotation = [data.lottery_id for data in data_for_rotation_selected]
     # get winner for given date and lottery id
     all_winners = []
     for idx, date in enumerate(all_dates_for_rotation):
-        winner_name = Result.query.filter_by(lottery_id=all_lottery_ids_for_rotation[idx]).order_by(
-            Result.final_ranking.asc()).first().name
+        winner_name = models.Result.query.filter_by(lottery_id=all_lottery_ids_for_rotation[idx]).order_by(
+            models.Result.final_ranking.asc()).first().name
         all_winners.append(winner_name)
     return render_template('rotations.html', rotation=rotation_selected, all_dates=all_dates_for_rotation,
                            all_winners=all_winners)
@@ -151,7 +156,7 @@ def allocations():
                                error="The total points allotted ({}) must not exceed {}".format(total_sum,
                                                                                                 MAX_ALLOCATION_POINTS))
     else:
-        save_points_for_given_user(current_user.email, allocations_list)
+        utils.save_points_for_given_user(current_user.email, allocations_list)
         return render_template('summary.html', rotation_numbers=ROTATION_NUMBERS, name=current_user.name)
 
 
@@ -168,22 +173,8 @@ def profile():
 @login_manager.user_loader
 def load_user(user_id):
     # since the user_id is just the primary key of our user table, use it in the query for the user
-    return User.query.get(int(user_id))
-
-
-class MyView(BaseView):
-    @expose('/')
-    def index(self):
-        return self.render('admin.html', rotation_numbers=ROTATION_NUMBERS)
-
-    # def is_accessible(self):
-    #     # rendering the view only if the user is authenticate
-    #     return current_user.is_authenticated()
-    #
+    return models.User.query.get(int(user_id))
 
 
 if __name__ == '__main__':
-    admin = Admin(app)
-    admin.add_view(ModelView(models.User, db.session))
-    admin.add_view(MyView(name='Lottery', endpoint='lottery'))
     app.run(debug=True)
