@@ -1,8 +1,9 @@
 import uuid
 import os
 from flask import Flask, jsonify, request, render_template, Blueprint
-from flask_login import login_required, current_user
-from flask_login import LoginManager
+from flask_login import LoginManager, login_required, current_user
+from flask_admin import Admin, BaseView, expose, AdminIndexView
+from flask_admin.contrib.sqla import ModelView
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS
@@ -74,8 +75,8 @@ def results():
             return render_template('error.html', error=str(e))
 
 
-@app.route('/admin', methods=['POST'])
-def admin():
+@app.route('/admin_lottery', methods=['POST'])
+def admin_lottery():
     if request.method == 'POST':
         try:
             rotation_number = int(request.form.get('rotation_select'))
@@ -86,7 +87,7 @@ def admin():
             save_lottery_drawing_results_in_database(names, weights, final_names_order, lottery_id)
             save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
 
-            rotations_run, dates_run = generate_data_for_stats_page()
+            dates_run, rotations_run = generate_data_for_stats_page()
             return render_template('stats.html', dates=dates_run, rotations=rotations_run)
         except Exception as e:
             print(f"Unable to save data in table: {e}")
@@ -110,7 +111,7 @@ def lottery():
 
 @app.route('/stats')
 def stats():
-    rotations_run, dates_run = generate_data_for_stats_page()
+    dates_run, rotations_run = generate_data_for_stats_page()
     return render_template('stats.html', dates=dates_run, rotations=rotations_run)
 
 
@@ -170,5 +171,18 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
+class MyView(BaseView):
+    @expose('/')
+    def index(self):
+        return self.render('admin.html', rotation_numbers=ROTATION_NUMBERS)
+
+    # def is_accessible(self):
+    #     # rendering the view only if the user is authenticate
+    #     return current_user.is_authenticated()
+    #
+
 if __name__ == '__main__':
+    admin = Admin(app)
+    admin.add_view(ModelView(models.User, db.session))
+    admin.add_view(MyView(name='Lottery', endpoint='lottery'))
     app.run(debug=True)
