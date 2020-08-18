@@ -8,9 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS
 import pandas as pd
 
-IMAGES_FOLDER = os.path.join('static', 'images')
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = IMAGES_FOLDER
 
 os.environ['APP_SETTINGS'] = "config.DevelopmentConfig"
 app.config.from_object(os.environ['APP_SETTINGS'])
@@ -53,12 +51,6 @@ def rotations_order():
         return jsonify(final_order), 200
     except Exception as e:
         return jsonify(str(e)), 500
-
-
-@app.route('/upload')
-def upload_file():
-    full_filename = os.path.join(app.config['UPLOAD_FOLDER'], 'sample.PNG')
-    return render_template('upload.html', sample_image=full_filename, rotation_numbers=ROTATION_NUMBERS)
 
 
 @app.route('/results', methods=['POST'])

@@ -11,11 +11,13 @@
 <div class="container">
     <div class="col-md-12">
         <br/>
-        <div class="col-md-12">
-            <h4>Welcome to the Admin Page! Here you can launch a lottery for a single rotation</h4>
+        <h5 class="col-md-12">
+            <h1>Welcome to the Admin Lottery Generator Page!</h1>
+            <h4>Start a lottery for a given rotation based on each users
+                points submissions or upload an existing file with the lottery data for all participants</h4>
             <br/>
-            <h5>After clicking submit you will see the results on the stats page</h5>
             <div class="col-md-12">
+                <h5>After clicking submit you will see the results on the stats page</h5>
                 <form action="/admin_lottery" method="POST"
                       enctype="multipart/form-data">
                     <div class="input-group">
@@ -27,6 +29,31 @@
                         </select>
                     </div>
                     <br/>
+                    <br/>
+                    <input type="submit"/>
+                </form>
+            </div>
+            <br/>
+            <hr style="color:black">
+            <div class="col-md-12">
+                <br/>
+                <h5>Upload a file with the names / points of all participants</h5>
+                <div style="font-style: italic">*Note: columns must include header as "Name" and "Points"</div>
+                <br/><br/>
+                <form action="/results" method="POST"
+                      enctype="multipart/form-data">
+                    <div class="input-group">
+                        <span class="input-group-addon">Select a rotation number</span>
+                        <select name="rotation_select" class="selectpicker form-control">
+                            {% for rotation in rotation_numbers %}
+                            <option value="{{ rotation }}">{{ rotation }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br/>
+                    <br/>
+                    <div style="font-style: italic">Choose a file in xls or xlsx format</div>
+                    <input type="file" name="file" accept=".xls, .xlsx"/>
                     <br/>
                     <input type="submit"/>
                 </form>
