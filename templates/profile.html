@@ -1,6 +1,7 @@
 <script>
-    function updateTextInput(val) {
-        document.getElementById('textInput').value = val;
+    function updateTextInput(el) {
+        let currIdx = el.name - 1;
+        document.getElementById('textInput' + '[' + currIdx + ']').value = el.value;
     }
 </script>
 
@@ -39,16 +40,14 @@
             <label for="pointsInput">Rotation {{ rotation }}:</label>
             {% if points_results %}
             <input type="range" name="{{rotation}}" id="pointsInput" value="{{points_results[loop.index -1]}}" min="1"
-                   max="100"
-                   onchange="updateTextInput(this.value);">
-            <input type="text" id="textInput" value="{{points_results[loop.index -1]}}"
-                   style="background: none; border:none;color:white">
+                   max="100" onchange="updateTextInput(this);"/>
+            <input type="text" id="textInput{{[loop.index -1]}}" value="{{points_results[loop.index -1]}}"
+                   style="background: none; border:none;color:white"/>
             <br/>
             {% else %}
             <input type="range" name="{{rotation}}" id="pointsInput" value="20" min="1"
-                   max="100"
-                   onchange="updateTextInput(this.value);">
-            <input type="text" id="textInput" value="20"
+                   max="100" onchange="updateTextInput(this);">
+            <input type="text" id="textInput{{[loop.index -1]}}" value="20"
                    style="background: none; border:none;color:white">
             <br/>
             {% endif %}

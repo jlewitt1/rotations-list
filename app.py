@@ -185,8 +185,7 @@ def allocations():
     total_sum = sum(allocations_list)
     if total_sum > MAX_ALLOCATION_POINTS:
         return render_template('error.html',
-                               error="The total points allotted ({}) must not exceed {}".format(total_sum,
-                                                                                                MAX_ALLOCATION_POINTS))
+                               error="The total points allotted must not exceed {}".format(MAX_ALLOCATION_POINTS))
     else:
         utils.save_points_for_given_user(current_user.email, allocations_list)
         return render_template('summary.html', rotation_numbers=ROTATION_NUMBERS, name=current_user.name)
@@ -206,13 +205,6 @@ def profile():
 def load_user(user_id):
     # since the user_id is just the primary key of our user table, use it in the query for the user
     return models.User.query.get(int(user_id))
-
-
-@app.route('/login')
-def login():
-    user = models.User.query.get(current_user)
-    login_user(user)
-    return 'Logged In!'
 
 
 @app.teardown_appcontext
