@@ -10,6 +10,7 @@
 <body>
 <script>
     function getRotationData(rotationSelected) {
+        // handle retrieval or rotation data based on user selection
         $('a').click(function (event) {
             event.preventDefault();
             $.ajax({
@@ -17,7 +18,6 @@
                 url: '/lottery_participants',
                 data: {"rotation": rotationSelected},
                 success: function (allParticipants) {
-                    console.log(allParticipants);
                     listSelector = $("#listSelector");
                     $.each(allParticipants, function (index, participant) {
                         listSelector.append("<li>" + participant.Name + ": " + participant.Points + "</li>")
@@ -25,14 +25,13 @@
                     $('#participants').append(listSelector)
                 }
             });
-            return false; // for good measure
+            return false;
         });
     }
 
     $(function () {
         $('#rotation-selected').change(function () {
             $('#rotation-val').val($(this).val());
-
             $("#listSelector").html('');
         }).change(); // Trigger the event
     });
@@ -63,7 +62,7 @@
                     <br/>
                     <div>Click <span><a href="javascript:getRotationData($('#rotation-selected').val())">here</a></span>
                         to load the full list of lottery allocations for rotation <input style="border:none"
-                                                                                          id="rotation-val" readonly/>
+                                                                                         id="rotation-val" readonly/>
                     </div>
                     <br/>
                     <div class="col-md-12" style="font-weight: bold" id="participants">

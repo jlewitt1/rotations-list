@@ -7,6 +7,7 @@ MAX_ALLOCATION_POINTS = 100
 
 # os.environ['DATABASE_URL'] = 'postgresql://localhost:5432/rotations'
 
+
 class Config(object):
     DEBUG = False
     TESTING = False

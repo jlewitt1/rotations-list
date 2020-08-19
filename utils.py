@@ -6,8 +6,7 @@ from app import db
 
 
 def choose_name_randomly(names, p_distribution):
-    draw = choice(names, len(names), p=list(p_distribution.flatten()))[0]
-    return draw
+    return choice(names, len(names), p=list(p_distribution.flatten()))[0]
 
 
 def generate_order(names, weights):
@@ -15,7 +14,7 @@ def generate_order(names, weights):
 
     np_weights = np.array(weights)
     total_sum = np.sum(np_weights, axis=1).reshape(1, 1)
-    p_distribution = np_weights / total_sum
+    p_distribution = np_weights / total_sum  # normalize points into a probability distribution
 
     for i in range(len(names)):
         name_drawn = choose_name_randomly(names, p_distribution)
@@ -26,10 +25,11 @@ def generate_order(names, weights):
     return final_order
 
 
-def get_names_and_weights(df):
+def get_names_and_points(df):
     names = df['Name'].tolist()
-    weights = df['Points'].tolist()
-    return names, weights
+    points = df['Points'].tolist()
+
+    return names, points
 
 
 def update_entries_for_lottery_results(names, weights, final_names_order, lottery_id):
@@ -82,7 +82,13 @@ def save_points_for_given_user(user_email, allocations_list):
 
 
 def get_name_from_email(email):
-    return db.session.query(models.User).filter_by(email=email).first().name
+    res = db.session.query(models.User).filter_by(email=email).first().name
+    return res
+
+
+def get_email_from_name(name):
+    res = db.session.query(models.User).filter_by(name=name).first().email
+    return res
 
 
 def build_dataframe_for_given_rotation(rotation_number):
@@ -102,8 +108,7 @@ def build_dataframe_for_given_rotation(rotation_number):
         result = db.session.query(models.Points.email, models.Points.points_five)
         res = [{"Name": get_name_from_email(user.email), "Points": user.points_five} for user in result]
 
-    df = pd.DataFrame(res)
-    return df
+    return pd.DataFrame(res)
 
 
 def get_current_point_totals_for_user(user_email):
@@ -119,5 +124,15 @@ def generate_data_for_stats_page():
     results_list = db.session.query(models.Overview).all()
     dates_run = [result.date for result in results_list]
     rotations_run = list(set([result.rotation_number for result in results_list]))
-
     return dates_run, rotations_run
+
+
+def generate_final_lottery_order_for_rotation(rotation_number, from_file):
+    if from_file:
+        df = pd.read_excel(from_file)
+    else:
+        df = build_dataframe_for_given_rotation(rotation_number)
+    names, points = get_names_and_points(df)
+    final_names_order = generate_order(names, [points])
+
+    return names, points, final_names_order

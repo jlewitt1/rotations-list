@@ -1,6 +1,11 @@
 {% extends 'admin/master.html' %}
 
 {% block body %}
-  <h4>This is the main page of the Admin Portal.</h4>
-  <h5>Click on the User tab to manage all users and the Lottery tab to begin a new lottery</h5>
+<h3>Admin Portal Home</h3>
+<h4 style="font-style: italic">User Tab</h4>
+<div>Manage all users: create, delete, and edit existing users</div>
+<h4 style="font-style: italic">Lottery Tab</h4>
+<div>Launch a new lottery based on registered user data or by uploading a new file</div>
+<br/>
+<div>Click <a href="{{ url_for('main.index') }}" class="navbar-item">here</a> to return to the home page</div>
 {% endblock %}
