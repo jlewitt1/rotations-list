@@ -7,5 +7,11 @@
       <jdbc-driver>org.postgresql.Driver</jdbc-driver>
       <jdbc-url>jdbc:postgresql://localhost:5432/rotations</jdbc-url>
     </data-source>
+    <data-source source="LOCAL" name="rotations_heroku" uuid="67d403aa-160f-4b02-8cc3-1e414a053d5e">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://ec2-3-248-4-172.eu-west-1.compute.amazonaws.com:5432/d21nng3lb6ei33?sslmode=require</jdbc-url>
+    </data-source>
   </component>
 </project>

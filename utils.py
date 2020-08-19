@@ -86,7 +86,6 @@ def get_name_from_email(email):
 
 
 def build_dataframe_for_given_rotation(rotation_number):
-    res = []
     if rotation_number == 1:
         result = db.session.query(models.Points.email, models.Points.points_one)
         res = [{"Name": get_name_from_email(user.email), "Points": user.points_one} for user in result]
@@ -99,7 +98,7 @@ def build_dataframe_for_given_rotation(rotation_number):
     elif rotation_number == 4:
         result = db.session.query(models.Points.email, models.Points.points_four)
         res = [{"Name": get_name_from_email(user.email), "Points": user.points_four} for user in result]
-    elif rotation_number == 5:
+    else:
         result = db.session.query(models.Points.email, models.Points.points_five)
         res = [{"Name": get_name_from_email(user.email), "Points": user.points_five} for user in result]
 

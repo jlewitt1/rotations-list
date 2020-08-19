@@ -1,6 +1,7 @@
 import uuid
 import os
-from flask import Flask, jsonify, request, render_template, Blueprint
+from flask import Flask, jsonify, request, render_template, Blueprint, flash
+from flask_admin.babel import gettext
 from flask_login import LoginManager, login_required, current_user
 from flask_admin import Admin, BaseView, expose
 from flask_admin.contrib.sqla import ModelView
@@ -26,6 +27,29 @@ class MyView(BaseView):
         return self.render('admin.html', rotation_numbers=ROTATION_NUMBERS)
 
 
+class MyModelView(ModelView):
+
+    def delete_model(self, model):
+        try:
+            self.on_model_delete(model)
+            email_to_query = model.email
+            points_record = db.session.query(models.Points).filter_by(email=email_to_query).first()
+            if points_record:  # if user to be deleted has also registered points - delete those too
+                self.session.delete(points_record)
+                flash(f'Successfully deleted points allocated for: {model.email}')
+            self.session.delete(model)
+            self.session.commit()
+        except Exception as ex:
+            if not self.handle_view_exception(ex):
+                print('Failed to delete record.')
+                flash(gettext('Failed to delete record. %(error)s', error=str(ex)), 'error')
+            self.session.rollback()
+            return False
+        else:
+            self.after_model_delete(model)
+        return True
+
+
 from auth import auth as auth_blueprint
 from main import main as main_blueprint
 import models
@@ -35,7 +59,7 @@ app.register_blueprint(auth_blueprint)
 app.register_blueprint(main_blueprint)
 
 admin = Admin(app)
-admin.add_view(ModelView(models.User, db.session))
+admin.add_view(MyModelView(models.User, db.session))
 admin.add_view(MyView(name='Lottery', endpoint='lottery'))
 
 import utils
@@ -110,6 +134,16 @@ def lottery():
 def stats():
     dates_run, rotations_run = utils.generate_data_for_stats_page()
     return render_template('stats.html', dates=dates_run, rotations=rotations_run)
+
+
+@app.route('/lottery_participants', methods=['POST'])
+def lottery_participants():
+    rotation_number = int(request.form['rotation'])
+    df = utils.build_dataframe_for_given_rotation(rotation_number)
+    if df.empty:
+        return f"Currently no participants for rotation {rotation_number}"
+    # if there is data for given rotation
+    return jsonify(df.to_dict('records'))
 
 
 @app.route("/dates", methods=['GET', 'POST'])
