@@ -11,7 +11,7 @@
 <script>
     function getRotationData(rotationSelected) {
         // handle retrieval or rotation data based on user selection
-        $('a').click(function (event) {
+        $('#data-href').click(function (event) {
             event.preventDefault();
             $.ajax({
                 type: 'POST',
@@ -60,7 +60,7 @@
                         </select>
                     </div>
                     <br/>
-                    <div>Click <span><a href="javascript:getRotationData($('#rotation-selected').val())">here</a></span>
+                    <div>Click <span><a id="data-href" href="javascript:getRotationData($('#rotation-selected').val())">here</a></span>
                         to load the full list of lottery allocations for rotation <input style="border:none"
                                                                                          id="rotation-val" readonly/>
                     </div>
