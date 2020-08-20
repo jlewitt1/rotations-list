@@ -7,8 +7,9 @@ import logging
 logging = logging.getLogger(__name__)
 
 auth = Blueprint('auth', __name__)
-from app import db, send_mail
+from app import db
 import models
+from app import send_mail
 
 
 @auth.route('/login', methods=['POST'])
