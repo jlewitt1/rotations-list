@@ -198,7 +198,10 @@ def index():
 
 @app.route('/profile')
 def profile():
-    return render_template('profile.html')
+    points_results = utils.get_current_point_totals_for_user(current_user.email)
+    return render_template('profile.html', name=current_user.name, email=current_user.email,
+                           max_points=MAX_ALLOCATION_POINTS, rotations=ROTATION_NUMBERS,
+                           points_results=points_results)
 
 
 @login_manager.user_loader

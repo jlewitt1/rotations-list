@@ -31,10 +31,10 @@
       <Owner>postgres</Owner>
       <IntrospectionStateNumber>3094</IntrospectionStateNumber>
       <Current>1</Current>
-      <Relations>sequence|table|58189|58191|1
+      <Relations>sequence|table|58221|58223|1
+sequence|table|58189|58191|1
 sequence|table|58197|58199|1
 sequence|table|58208|58210|1
-sequence|table|58221|58223|1
 </Relations>
     </database>
     <database id="8" parent="1" name="suppliers">
