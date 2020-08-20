@@ -7,7 +7,7 @@ import logging
 logging = logging.getLogger(__name__)
 
 auth = Blueprint('auth', __name__)
-from app import send_mail, db
+from app import db
 import models
 
 
@@ -49,11 +49,11 @@ def signup_post():
     # add the new user to the database
     db.session.add(new_user)
     db.session.commit()
-    try:
-        send_mail(subject=MAIL_CONFIG["welcome_subj"], recipient=email, html_body=render_template('email/welcome.html',
-                                                                                                  user=name))
-    except Exception as e:
-        logging.error(f"Failed to send mail to {email}: {e}")
+    # try:
+    #     send_mail(subject=MAIL_CONFIG["welcome_subj"], recipient=email, html_body=render_template('email/welcome.html',
+    #                                                                                               user=name))
+    # except Exception as e:
+    #     logging.error(f"Failed to send mail to {email}: {e}")
     return redirect(url_for('auth.login'))
 
 
