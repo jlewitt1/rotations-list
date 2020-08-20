@@ -1,9 +1,13 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
+from config import MAIL_CONFIG
+import logging
+
+logging = logging.getLogger(__name__)
 
 auth = Blueprint('auth', __name__)
-from app import db
+from app import db, send_mail
 import models
 
 
@@ -45,7 +49,11 @@ def signup_post():
     # add the new user to the database
     db.session.add(new_user)
     db.session.commit()
-
+    try:
+        send_mail(subject=MAIL_CONFIG["welcome_subj"], recipient=email, html_body=render_template('email/welcome.html',
+                                                                                                  user=name))
+    except Exception as e:
+        logging.error(f"Failed to send mail to {email}: {e}")
     return redirect(url_for('auth.login'))
 
 

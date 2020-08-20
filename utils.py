@@ -3,6 +3,9 @@ from numpy.random import choice
 import pandas as pd
 import models
 from app import db
+import logging
+
+logging = logging.getLogger(__name__)
 
 
 def choose_name_randomly(names, p_distribution):
@@ -136,3 +139,9 @@ def generate_final_lottery_order_for_rotation(rotation_number, from_file):
     final_names_order = generate_order(names, [points])
 
     return names, points, final_names_order
+
+
+def get_all_mail_recipients():
+    query_result = db.session.query(models.User).all()
+    all_users = [{"name": result.name, "email": result.email} for result in query_result]
+    return all_users

@@ -1,12 +1,17 @@
 import uuid
 import os
+from threading import Thread
+import logging
 from flask import Flask, jsonify, request, render_template, Blueprint, flash, redirect, url_for
 from flask_admin.babel import gettext
-from flask_login import LoginManager, login_required, current_user, login_user
+from flask_login import LoginManager, login_required, current_user
 from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
+from flask_mail import Mail, Message
 from flask_sqlalchemy import SQLAlchemy
-from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS
+from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG
+
+logging = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
@@ -18,6 +23,11 @@ db = SQLAlchemy(app)
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
+
+# configure mail settings
+app.config.update(MAIL_SERVER='smtp.gmail.com', MAIL_PORT=465, MAIL_USE_SSL=True,
+                  MAIL_USERNAME=os.environ['MAIL_ACCOUNT'], MAIL_PASSWORD=os.environ['MAIL_PASSWORD'])
+mail = Mail(app)
 
 
 # initialize custom views for admin panel
@@ -35,7 +45,7 @@ class MyModelView(ModelView):
         return current_user.is_authenticated
 
     def inaccessible_callback(self, name, **kwargs):
-        return redirect(url_for('login'))
+        return redirect(url_for('auth.login'))
 
     def delete_model(self, model):
         try:
@@ -49,7 +59,7 @@ class MyModelView(ModelView):
             self.session.commit()
         except Exception as ex:
             if not self.handle_view_exception(ex):
-                print('Failed to delete record.')
+                logging.info('Failed to delete record.')
                 flash(gettext('Failed to delete record. %(error)s', error=str(ex)), 'error')
             self.session.rollback()
             return False
@@ -94,7 +104,7 @@ def results():
             return render_template('results.html', names=final_names_order, all_data={"names": names,
                                                                                       "weights": points})
         except Exception as e:
-            print(f"Unable to save data in table: {e}")
+            logging.error(f"Unable to save data in table: {e}")
             return render_template('error.html', error=str(e))
 
 
@@ -112,7 +122,7 @@ def admin_lottery():
             dates_run, rotations_run = utils.generate_data_for_stats_page()
             return render_template('stats.html', dates=dates_run, rotations=rotations_run)
         except Exception as e:
-            print(f"Unable to save data in table: {e}")
+            logging.error(f"Unable to save data in table: {e}")
             return render_template('error.html', error=str(e))
 
 
@@ -187,8 +197,29 @@ def allocations():
         return render_template('error.html',
                                error="The total points allotted must not exceed {}".format(MAX_ALLOCATION_POINTS))
     else:
-        utils.save_points_for_given_user(current_user.email, allocations_list)
+        try:
+            utils.save_points_for_given_user(current_user.email, allocations_list)
+            send_mail(subject=MAIL_CONFIG["update_subj"], recipient=current_user.email,
+                      html_body=render_template('email/status.html', user=current_user.name,
+                                                points_remaining=str(MAX_ALLOCATION_POINTS - total_sum)))
+        except Exception as e:
+            logging.error(f"failed to save points and send email for {current_user.email}: {e}")
         return render_template('summary.html', rotation_numbers=ROTATION_NUMBERS, name=current_user.name)
+
+
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+
+def send_mail(subject, recipient, html_body):
+    try:
+        msg = Message(subject, sender=os.environ['MAIL_ACCOUNT'], recipients=[recipient])
+        msg.html = html_body
+        Thread(target=send_async_email, args=(app, msg)).start()
+        return 'Mail sent!'
+    except Exception as e:
+        return str(e)
 
 
 @app.route('/')
