@@ -207,21 +207,6 @@ def allocations():
         return render_template('summary.html', rotation_numbers=ROTATION_NUMBERS, name=current_user.name)
 
 
-def send_async_email(app, msg):
-    with app.app_context():
-        mail.send(msg)
-
-
-def send_mail(subject, recipient, html_body):
-    try:
-        msg = Message(subject, sender=os.environ['MAIL_ACCOUNT'], recipients=[recipient])
-        msg.html = html_body
-        Thread(target=send_async_email, args=(app, msg)).start()
-        return 'Mail sent!'
-    except Exception as e:
-        return str(e)
-
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -245,6 +230,21 @@ def load_user(user_id):
 def shutdown_session(exception=None):
     """automatically close all unused/hanging connections and prevent bottleneck"""
     db.session.remove()
+
+
+def send_async_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+
+def send_mail(subject, recipient, html_body):
+    try:
+        msg = Message(subject, sender=os.environ['MAIL_ACCOUNT'], recipients=[recipient])
+        msg.html = html_body
+        Thread(target=send_async_email, args=(app, msg)).start()
+        return 'Mail sent!'
+    except Exception as e:
+        return str(e)
 
 
 if __name__ == '__main__':
