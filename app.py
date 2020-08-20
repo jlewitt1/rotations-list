@@ -40,7 +40,7 @@ class MyView(BaseView):
         return self.render('admin.html', rotation_numbers=ROTATION_NUMBERS)
 
 
-class MyModelView(ModelView):
+class UserModelView(ModelView):
     def is_accessible(self):
         return current_user.is_authenticated
 
@@ -55,6 +55,46 @@ class MyModelView(ModelView):
             if points_record:  # if user to be deleted has also registered points - delete those too
                 self.session.delete(points_record)
                 flash(f'Successfully deleted points allocated for: {model.email}')
+            self.session.delete(model)
+            self.session.commit()
+        except Exception as ex:
+            if not self.handle_view_exception(ex):
+                logging.info('Failed to delete record.')
+                flash(gettext('Failed to delete record. %(error)s', error=str(ex)), 'error')
+            self.session.rollback()
+            return False
+        else:
+            self.after_model_delete(model)
+        return True
+
+
+class PointsModelView(ModelView):
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.login'))
+
+
+class OverviewModelView(ModelView):
+    can_create = False
+    can_edit = False
+
+    def is_accessible(self):
+        return current_user.is_authenticated
+
+    def inaccessible_callback(self, name, **kwargs):
+        return redirect(url_for('auth.login'))
+
+    def delete_model(self, model):  # when deleting a lottery remove all results for given lottery
+        try:
+            self.on_model_delete(model)
+            lottery_id_to_remove = model.lottery_id
+            all_results = db.session.query(models.Result).filter(models.Result.lottery_id == lottery_id_to_remove).all()
+            for result in all_results:
+                self.session.delete(result)
+            flash(f'Successfully deleted all names and points associated with lottery id: {lottery_id_to_remove}')
             self.session.delete(model)
             self.session.commit()
         except Exception as ex:
@@ -83,7 +123,9 @@ app.register_blueprint(auth_blueprint)
 app.register_blueprint(main_blueprint)
 # add admin panels to app
 admin = Admin(app, index_view=MyAdminIndexView())
-admin.add_view(MyModelView(models.User, db.session))
+admin.add_view(UserModelView(models.User, db.session))
+admin.add_view(PointsModelView(models.Points, db.session))
+admin.add_view(OverviewModelView(models.Overview, db.session))
 admin.add_view(MyView(name='Lottery', endpoint='lottery'))
 
 import utils

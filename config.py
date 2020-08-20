@@ -5,7 +5,7 @@ ROTATION_NUMBERS = [1, 2, 3, 4, 5]
 MAX_ALLOCATION_POINTS = 100
 MAIL_CONFIG = {
     "update_subj": "Lottery System: Points Allocation Update",
-    "welcome_subj": "Welcome to Lottery System"
+    "welcome_subj": "Welcome to the Lottery System"
 }
 
 
