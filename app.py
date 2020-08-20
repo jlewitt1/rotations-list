@@ -1,13 +1,12 @@
 import uuid
 import os
-from threading import Thread
 import logging
 from flask import Flask, jsonify, request, render_template, Blueprint, flash, redirect, url_for
 from flask_admin.babel import gettext
 from flask_login import LoginManager, login_required, current_user
 from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
-from flask_mail import Mail, Message
+from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
 from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG
 
@@ -28,6 +27,7 @@ login_manager.init_app(app)
 app.config.update(MAIL_SERVER='smtp.gmail.com', MAIL_PORT=587, MAIL_USE_SSL=False, MAIL_USE_TLS=True,
                   MAIL_USERNAME=os.environ['MAIL_ACCOUNT'], MAIL_PASSWORD=os.environ['MAIL_PASSWORD'])
 mail = Mail(app)
+import emails
 
 
 # initialize custom views for admin panel
@@ -199,9 +199,9 @@ def allocations():
     else:
         try:
             utils.save_points_for_given_user(current_user.email, allocations_list)
-            send_mail(subject=MAIL_CONFIG["update_subj"], recipient=current_user.email,
-                      html_body=render_template('email/status.html', user=current_user.name,
-                                                points_remaining=str(MAX_ALLOCATION_POINTS - total_sum)))
+            emails.send_mail(subject=MAIL_CONFIG["update_subj"], recipient=current_user.email,
+                             html_body=render_template('email/status.html', user=current_user.name,
+                                                       points_remaining=str(MAX_ALLOCATION_POINTS - total_sum)))
         except Exception as e:
             logging.error(f"failed to save points and send email for {current_user.email}: {e}")
         return render_template('summary.html', rotation_numbers=ROTATION_NUMBERS, name=current_user.name)
@@ -230,21 +230,6 @@ def load_user(user_id):
 def shutdown_session(exception=None):
     """automatically close all unused/hanging connections and prevent bottleneck"""
     db.session.remove()
-
-
-def send_async_email(app, msg):
-    with app.app_context():
-        mail.send(msg)
-
-
-def send_mail(subject, recipient, html_body):
-    try:
-        msg = Message(subject, sender=os.environ['MAIL_ACCOUNT'], recipients=[recipient])
-        msg.html = html_body
-        Thread(target=send_async_email, args=(app, msg)).start()
-        return 'Mail sent!'
-    except Exception as e:
-        return str(e)
 
 
 if __name__ == '__main__':
