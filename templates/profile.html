@@ -14,12 +14,11 @@
 <div class="col-md-12" style="text-align: left">
     <br/>
     <div>You have been assigned a total of <b>{{ max_points }}</b> points to distribute across <b>{{
-        rotations|length}} </b>
-        rotations
+        rotations|length}} </b> rotations
     </div>
     <br/>
     {% if points_results %}
-    <div>Here are the most recent points you allocated:</div>
+    <div>Here are the current points you have allocated:</div>
     <ul style="list-style: none;">
         {% for result in points_results %}
         <li>Rotation {{loop.index}}: <b>{{result}}</b></li>
@@ -28,33 +27,55 @@
     {% endif %}
     <br/>
     {% if points_results %}
-    <div>You can resubmit your allocations below until an official lottery has occurred</div>
-    {% else %}
-    <div>Please select below the points you would like to allocate for each rotation</div>
-    {% endif %}
-    <br/>
-    <div class="input-group">
-        <form name="{{name}}" action="/allocations" method="POST" enctype="multipart/form-data">
-            {% for rotation in rotations %}
-            <label for="pointsInput">Rotation {{ rotation }}:</label>
-            {% if points_results %}
-            <input type="range" name="{{rotation}}" id="pointsInput" value="{{points_results[loop.index -1]}}" min="1"
-                   max="100" onchange="updateTextInput(this);"/>
-            <input type="text" id="textInput{{[loop.index -1]}}" value="{{points_results[loop.index -1]}}"
-                   style="background: none; border:none;color:white"/>
+    <div class="col-md-12" id="trial">
+        <h1 style="font-weight: bold">**NEXT STEPS**</h1>
+        <br/>
+        <div>1. Adjust your allocations below</div>
+        {% else %}
+        <div>Please select the points you would like to allocate for each rotation</div>
+        {% endif %}
+        <br/>
+        <div class="input-group">
+            <form name="{{name}}" action="/allocations" method="POST" enctype="multipart/form-data">
+                {% for rotation in rotations %}
+                <label for="pointsInput">Rotation {{ rotation }}:</label>
+                {% if points_results %}
+                <input type="range" name="{{rotation}}" id="pointsInput" value="{{points_results[loop.index -1]}}"
+                       min="1"
+                       max="100" onchange="updateTextInput(this);"/>
+                <input type="text" id="textInput{{[loop.index -1]}}" value="{{points_results[loop.index -1]}}"
+                       style="background: none; border:none;color:white"/>
+                <br/>
+                {% else %}
+                <input type="range" name="{{rotation}}" id="pointsInput" value="20" min="1"
+                       max="100" onchange="updateTextInput(this);">
+                <input type="text" id="textInput{{[loop.index -1]}}" value="20"
+                       style="background: none; border:none;color:white">
+                <br/>
+                {% endif %}
+                {% endfor %}
+                <br/>
+                <input type="submit" value="Update Allocations"/>
+            </form>
+        </div>
+        <br/>
+        {% if points_results %}
+        <div>2. Run an unofficial/test lottery to see how it works</div>
+        <form action="/lottery" method="POST"
+              enctype="multipart/form-data">
+            <div class="input-group">
+                <br/>
+                <span class="input-group-addon">Select a rotation number for running the lottery:</span>
+                <select name="rotation_select" class="selectpicker form-control">
+                    {% for rotation in rotations %}
+                    <option value="{{ rotation }}">{{ rotation }}</option>
+                    {% endfor %}
+                </select>
+            </div>
             <br/>
-            {% else %}
-            <input type="range" name="{{rotation}}" id="pointsInput" value="20" min="1"
-                   max="100" onchange="updateTextInput(this);">
-            <input type="text" id="textInput{{[loop.index -1]}}" value="20"
-                   style="background: none; border:none;color:white">
-            <br/>
-            {% endif %}
-            {% endfor %}
-            <br/>
-            <br/>
-            <input type="submit"/>
+            <input type="submit" value="Begin Lottery"/>
         </form>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

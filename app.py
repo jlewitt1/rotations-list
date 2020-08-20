@@ -13,15 +13,15 @@ from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG
 logging = logging.getLogger(__name__)
 
 app = Flask(__name__)
-os.environ['APP_SETTINGS'] = "config.DevelopmentConfig"
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"max_overflow": 15, "pool_pre_ping": True, "pool_recycle": 60 * 60,
+                                           "pool_size": 30}
 db = SQLAlchemy(app)
 # add login to app
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
-
 # configure mail settings
 app.config.update(MAIL_SERVER='smtp.gmail.com', MAIL_PORT=587, MAIL_USE_SSL=False, MAIL_USE_TLS=True,
                   MAIL_USERNAME=os.environ['MAIL_ACCOUNT'], MAIL_PASSWORD=os.environ['MAIL_PASSWORD'])

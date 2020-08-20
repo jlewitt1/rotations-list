@@ -4,38 +4,14 @@
 <div class="col-md-12" style="text-align: left">
     <h1>Thanks for submitting your points! </h1>
     <br/>
-    <h4>You can resubmit your point allocations at any time until an official lottery has been launched</h4>
-    <br/>
+    <h4>You can resubmit your point allocations at any time <span><a style="color: blue" href="{{ url_for('profile')}}">here</a></span> until an official lottery has been launched</h4>
     <br/>
     <div class="col-md-12">
-        <h1 style="font-weight: bold">**NEXT STEPS**</h1>
-        <br/>
-        <div>Wait for an admin to launch an official lottery</div>
-        <br/>
         <div>In the meantime, you can:</div>
         <div>1. Click <span><a style="color: blue" href="{{ url_for('stats')}}">here</a></span> to see results for past
             official lotteries
         </div>
-        <div class="col-md-12" id="trial">
-            <div>2. Launch an unofficial lottery below to see how it works</div>
-            <form action="/lottery" method="POST"
-                  enctype="multipart/form-data">
-                <div class="input-group">
-                    <br/>
-                    <span class="input-group-addon">Select a rotation number for running the lottery:</span>
-                    <select name="rotation_select" class="selectpicker form-control">
-                        {% for rotation in rotation_numbers %}
-                        <option value="{{ rotation }}">{{ rotation }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <br/>
-                <input type="submit"/>
-            </form>
-            <br/>
-            <div style="font-style: italic">*Note: Results from this trial run will not be saved</div>
-            <br/>
-        </div>
+        <div>2. Tell your friends to sign up and register their points</div>
     </div>
 </div>
 {% endblock %}
