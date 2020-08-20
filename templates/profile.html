@@ -28,9 +28,9 @@
     <br/>
     {% if points_results %}
     <div class="col-md-12" id="trial">
-        <h1 style="font-weight: bold">**NEXT STEPS**</h1>
+        <h1 style="font-weight: bold">SUGGESTED NEXT STEPS</h1>
         <br/>
-        <div>1. Adjust your allocations below</div>
+        <div style="font-style: italic">1. Update your allocations below</div>
         {% else %}
         <div>Please select the points you would like to allocate for each rotation</div>
         {% endif %}
@@ -60,7 +60,7 @@
         </div>
         <br/>
         {% if points_results %}
-        <div>2. Run an unofficial/test lottery to see how it works</div>
+        <div style="font-style: italic">2. Run an unofficial/test lottery to see how it works</div>
         <form action="/lottery" method="POST"
               enctype="multipart/form-data">
             <div class="input-group">
