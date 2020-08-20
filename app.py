@@ -13,7 +13,6 @@ from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG
 logging = logging.getLogger(__name__)
 
 app = Flask(__name__)
-
 os.environ['APP_SETTINGS'] = "config.DevelopmentConfig"
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -41,6 +40,8 @@ class MyView(BaseView):
 
 
 class UserModelView(ModelView):
+    can_edit = False
+
     def is_accessible(self):
         return current_user.is_authenticated
 
@@ -69,6 +70,8 @@ class UserModelView(ModelView):
 
 
 class PointsModelView(ModelView):
+    can_create = False
+    form_excluded_columns = ['email']
 
     def is_accessible(self):
         return current_user.is_authenticated
