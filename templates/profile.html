@@ -12,7 +12,6 @@
     Hi, {{ name }}!
 </h1>
 <div class="col-md-12" style="text-align: left">
-    <h1>This is the Lottery Selection Process</h1>
     <br/>
     <div>Each person is assigned a total of <b>{{ max_points }}</b> points to distribute across <b>{{
         rotations|length}} </b>
@@ -29,7 +28,7 @@
     {% endif %}
     <br/>
     {% if points_results %}
-    <div>You can resubmit your allocations below</div>
+    <div>You can resubmit your allocations below until an official lottery has occurred</div>
     {% else %}
     <div>Please select below the points you would like to allocate for each rotation</div>
     {% endif %}
