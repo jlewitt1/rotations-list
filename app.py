@@ -25,7 +25,7 @@ login_manager.login_view = 'auth.login'
 login_manager.init_app(app)
 
 # configure mail settings
-app.config.update(MAIL_SERVER='smtp.gmail.com', MAIL_PORT=465, MAIL_USE_SSL=True,
+app.config.update(MAIL_SERVER='smtp.gmail.com', MAIL_PORT=587, MAIL_USE_SSL=False, MAIL_USE_TLS=True,
                   MAIL_USERNAME=os.environ['MAIL_ACCOUNT'], MAIL_PASSWORD=os.environ['MAIL_PASSWORD'])
 mail = Mail(app)
 
