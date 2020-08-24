@@ -9010,6 +9010,7 @@ sequence|table|2910431|2910433|1
     </table>
     <table id="2096" parent="2080" name="points">
       <ObjectId>2910433</ObjectId>
+      <Outdated>1</Outdated>
       <Owner>ypiigmhdmjcrgm</Owner>
       <StateNumber>6371647</StateNumber>
     </table>
