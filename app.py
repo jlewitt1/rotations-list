@@ -8,10 +8,9 @@ from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
-from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG
+from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG, ROTATION_NAMES
 
 logging = logging.getLogger(__name__)
-
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -36,7 +35,7 @@ class MyView(BaseView):
 
     @expose('/')
     def index(self):
-        return self.render('admin.html', rotation_numbers=ROTATION_NUMBERS)
+        return self.render('admin.html', rotation_numbers=ROTATION_NUMBERS, rotation_names=ROTATION_NAMES)
 
 
 class UserModelView(ModelView):
@@ -71,7 +70,10 @@ class UserModelView(ModelView):
 
 class PointsModelView(ModelView):
     can_create = False
+    can_edit = False
     form_excluded_columns = ['email']
+    column_labels = dict(points_one=ROTATION_NAMES[0], points_two=ROTATION_NAMES[1], points_three=ROTATION_NAMES[2],
+                         points_four=ROTATION_NAMES[3], points_five=ROTATION_NAMES[4], points_six=ROTATION_NAMES[5])
 
     def is_accessible(self):
         return current_user.is_authenticated
@@ -165,7 +167,8 @@ def admin_lottery():
             utils.save_lottery_drawing_results_in_database(names, points, final_names_order, lottery_id)
             utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
             dates_run, rotations_run = utils.generate_data_for_stats_page()
-            return render_template('stats.html', dates=dates_run, rotations=rotations_run)
+            return render_template('stats.html', dates=dates_run, rotations=rotations_run,
+                                   rotation_names=ROTATION_NAMES)
         except Exception as e:
             logging.error(f"Unable to save data in table: {e}")
             return render_template('error.html', error=str(e))
@@ -190,7 +193,7 @@ def lottery():
 def stats():
     """main stats page showing all dates for lotteries run and all rotations represented"""
     dates_run, rotations_run = utils.generate_data_for_stats_page()
-    return render_template('stats.html', dates=dates_run, rotations=rotations_run)
+    return render_template('stats.html', dates=dates_run, rotations=rotations_run, rotation_names=ROTATION_NAMES)
 
 
 @app.route('/lottery_participants', methods=['POST'])
@@ -227,8 +230,8 @@ def rotations():
         winner_name = models.Result.query.filter_by(lottery_id=all_lottery_ids_for_rotation[idx]).order_by(
             models.Result.final_ranking.asc()).first().name
         all_winners.append(winner_name)
-    return render_template('rotations.html', rotation=rotation_selected, all_dates=all_dates_for_rotation,
-                           all_winners=all_winners)
+    return render_template('rotations.html', all_dates=all_dates_for_rotation, all_winners=all_winners,
+                           rotation_name=ROTATION_NAMES[int(rotation_selected) - 1])
 
 
 @login_required
@@ -262,7 +265,7 @@ def profile():
     points_results = utils.get_current_point_totals_for_user(current_user.email)
     return render_template('profile.html', name=current_user.name, email=current_user.email,
                            max_points=MAX_ALLOCATION_POINTS, rotations=ROTATION_NUMBERS,
-                           points_results=points_results)
+                           points_results=points_results, rotation_names=ROTATION_NAMES)
 
 
 @login_manager.user_loader

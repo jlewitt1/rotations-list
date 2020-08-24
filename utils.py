@@ -76,10 +76,11 @@ def save_points_for_given_user(user_email, allocations_list):
         current_user.points_three = allocations_list[2]
         current_user.points_four = allocations_list[3]
         current_user.points_five = allocations_list[4]
+        current_user.points_six = allocations_list[5]
     else:
         points_obj = models.Points(email=user_email, points_one=allocations_list[0], points_two=allocations_list[1],
                                    points_three=allocations_list[2], points_four=allocations_list[3],
-                                   points_five=allocations_list[4])
+                                   points_five=allocations_list[4], points_six=allocations_list[5])
         db.session.add(points_obj)
     db.session.commit()
 
@@ -107,10 +108,12 @@ def build_dataframe_for_given_rotation(rotation_number):
     elif rotation_number == 4:
         result = db.session.query(models.Points.email, models.Points.points_four)
         res = [{"Name": get_name_from_email(user.email), "Points": user.points_four} for user in result]
-    else:
+    elif rotation_number == 5:
         result = db.session.query(models.Points.email, models.Points.points_five)
         res = [{"Name": get_name_from_email(user.email), "Points": user.points_five} for user in result]
-
+    else:
+        result = db.session.query(models.Points.email, models.Points.points_six)
+        res = [{"Name": get_name_from_email(user.email), "Points": user.points_six} for user in result]
     return pd.DataFrame(res)
 
 
@@ -119,7 +122,7 @@ def get_current_point_totals_for_user(user_email):
     query_results = db.session.query(models.Points).filter_by(email=user_email).first()
     if query_results:  # if user has already saved points in DB
         results = [query_results.points_one, query_results.points_two, query_results.points_three,
-                   query_results.points_four, query_results.points_five]
+                   query_results.points_four, query_results.points_five, query_results.points_six]
     return results
 
 

@@ -35,7 +35,7 @@
                 </form>
             </div>
             <div class="col-md-6">
-                <div>Filter by rotation number:</div>
+                <div>Filter by rotation:</div>
                 <br/>
                 <form class="form-inline" method="POST" action="{{ url_for('rotations') }}">
                     <div class="form-group">
@@ -43,7 +43,7 @@
                             <span class="input-group-addon">Select a rotation</span>
                             <select name="rotation_select" class="selectpicker form-control">
                                 {% for rotation in rotations %}
-                                <option value="{{ rotation }}">{{ rotation }}</option>
+                                <option value="{{ rotation }}">{{ rotation_names[loop.index-1] }}</option>
                                 {% endfor %}
                             </select>
                         </div>

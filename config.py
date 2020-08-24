@@ -1,8 +1,10 @@
 import os
 
 basedir = os.path.abspath(os.path.dirname(__file__))
-ROTATION_NUMBERS = [1, 2, 3, 4, 5]
-MAX_ALLOCATION_POINTS = 100
+ROTATION_NUMBERS = [1, 2, 3, 4, 5, 6]
+ROTATION_NAMES = ['Internal', 'Ob/Gyn', 'Pediatrics', 'Psych', 'Neuro', 'Surgery']
+
+MAX_ALLOCATION_POINTS = 30
 MAIL_CONFIG = {
     "update_subj": "Lottery System: Points Allocation Update",
     "welcome_subj": "Welcome to the Lottery System"

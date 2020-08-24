@@ -50,14 +50,16 @@ class Points(db.Model):
     points_three = db.Column(db.Integer)
     points_four = db.Column(db.Integer)
     points_five = db.Column(db.Integer)
+    points_six = db.Column(db.Integer)
 
-    def __init__(self, email, points_one, points_two, points_three, points_four, points_five):
+    def __init__(self, email, points_one, points_two, points_three, points_four, points_five, points_six):
         self.email = email
         self.points_one = points_one
         self.points_two = points_two
         self.points_three = points_three
         self.points_four = points_four
         self.points_five = points_five
+        self.points_six = points_five
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

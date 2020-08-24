@@ -52,24 +52,23 @@
                 <form action="/admin_lottery" method="POST"
                       enctype="multipart/form-data">
                     <div class="input-group">
-                        <span class="input-group-addon">Select a rotation number</span>
+                        <span class="input-group-addon">Select a rotation</span>
                         <select name="rotation_select" id="rotation-selected" class="selectpicker form-control">
                             {% for rotation in rotation_numbers %}
-                            <option value="{{ rotation }}">{{ rotation }}</option>
+                            <option value="{{ rotation }}">{{ rotation_names[loop.index-1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
                     <br/>
                     <div>Click <span><a id="data-href" href="javascript:getRotationData($('#rotation-selected').val())">here</a></span>
-                        to load the full list of lottery allocations for rotation <input style="border:none"
-                                                                                         id="rotation-val" readonly/>
+                        to see all participants and allocations
                     </div>
                     <br/>
                     <div class="col-md-12" style="font-weight: bold" id="participants">
                         <ul id="listSelector"></ul>
                     </div>
                     <br/><br/>
-                    <input type="submit"/>
+                    <input type="submit" value="Launch Lottery"/>
                 </form>
             </div>
             <br/>
@@ -82,10 +81,10 @@
                 <form action="/results" method="POST"
                       enctype="multipart/form-data">
                     <div class="input-group">
-                        <span class="input-group-addon">Select a rotation number</span>
+                        <span class="input-group-addon">Select a rotation</span>
                         <select name="rotation_select" class="selectpicker form-control">
                             {% for rotation in rotation_numbers %}
-                            <option value="{{ rotation }}">{{ rotation }}</option>
+                            <option value="{{ rotation }}">{{ rotation_names[loop.index-1] }}</option>
                             {% endfor %}
                         </select>
                     </div>
@@ -94,7 +93,7 @@
                     <div style="font-style: italic">File must be in xls or xlsx format</div>
                     <input type="file" name="file" accept=".xls, .xlsx"/>
                     <br/>
-                    <input type="submit"/>
+                    <input type="submit" value="Launch Lottery"/>
                 </form>
                 <br/><br/>
                 <div>Click <a href="{{ url_for('admin.index') }}" class="navbar-item">here</a> to return to the main
