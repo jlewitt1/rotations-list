@@ -40,6 +40,7 @@ class MyView(BaseView):
 
 class UserModelView(ModelView):
     can_edit = False
+    column_list = ('name', 'email')
 
     def is_accessible(self):
         return current_user.is_authenticated
