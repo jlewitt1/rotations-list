@@ -1,4 +1,5 @@
 import datetime
+from datetime import timezone
 from sqlalchemy.dialects.postgresql import UUID
 from flask_login import UserMixin
 from app import db
@@ -34,7 +35,7 @@ class Overview(db.Model):
     def __init__(self, lottery_id, rotation_number):
         self.lottery_id = lottery_id
         self.rotation_number = rotation_number
-        self.date = datetime.datetime.utcnow()
+        self.date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(tz=None)
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -45,6 +46,7 @@ class Points(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True)
+    num_submissions = db.Column(db.Integer)
     points_one = db.Column(db.Integer)
     points_two = db.Column(db.Integer)
     points_three = db.Column(db.Integer)
@@ -54,12 +56,13 @@ class Points(db.Model):
 
     def __init__(self, email, points_one, points_two, points_three, points_four, points_five, points_six):
         self.email = email
+        self.num_submissions = 0
         self.points_one = points_one
         self.points_two = points_two
         self.points_three = points_three
         self.points_four = points_four
         self.points_five = points_five
-        self.points_six = points_five
+        self.points_six = points_six
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

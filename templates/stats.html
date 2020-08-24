@@ -25,7 +25,7 @@
                             <span class="input-group-addon">Select a date</span>
                             <select size="10" name="date_select" class="selectpicker form-control">
                                 {% for date in dates %}
-                                <option value="{{ date }}">{{ date }}</option>
+                                <option value="{{ date }}">{{ date.strftime('%Y-%m-%d, %H:%M') }}</option>
                                 {% endfor %}
                             </select>
                         </div>

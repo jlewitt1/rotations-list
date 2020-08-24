@@ -17,9 +17,9 @@
             <div class="results-holder">
                 <div>Lottery winners by date:</div>
                 <br/>
-                <ul style="list-style: none;">
+                <ul style="list-style: none; max-height: 350px; overflow:auto; width:50%">
                     {% for date in all_dates %}
-                    <li>{{ date }}: <b>{{ all_winners[loop.index - 1] }}</b></li>
+                    <li>{{ date.strftime('%Y-%m-%d, %H:%M') }}: <b>{{ all_winners[loop.index - 1] }}</b></li>
                     {% endfor %}
                 </ul>
             </div>

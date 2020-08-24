@@ -8,7 +8,7 @@ from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
-from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG, ROTATION_NAMES
+from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG, ROTATION_NAMES, MAX_SUBMISSIONS
 
 logging = logging.getLogger(__name__)
 app = Flask(__name__)
@@ -71,7 +71,7 @@ class UserModelView(ModelView):
 class PointsModelView(ModelView):
     can_create = False
     can_edit = False
-    form_excluded_columns = ['email']
+    column_list = ('email', 'points_one', 'points_two', 'points_three', 'points_four', 'points_five', 'points_six')
     column_labels = dict(points_one=ROTATION_NAMES[0], points_two=ROTATION_NAMES[1], points_three=ROTATION_NAMES[2],
                          points_four=ROTATION_NAMES[3], points_five=ROTATION_NAMES[4], points_six=ROTATION_NAMES[5])
 
@@ -128,10 +128,10 @@ app.register_blueprint(auth_blueprint)
 app.register_blueprint(main_blueprint)
 # add admin panels to app
 admin = Admin(app, index_view=MyAdminIndexView())
-admin.add_view(UserModelView(models.User, db.session))
-admin.add_view(PointsModelView(models.Points, db.session))
-admin.add_view(OverviewModelView(models.Overview, db.session))
-admin.add_view(MyView(name='Lottery', endpoint='lottery'))
+admin.add_view(UserModelView(models.User, db.session, name="Registered Users"))
+admin.add_view(PointsModelView(models.Points, db.session, name="Points Allocations"))
+admin.add_view(OverviewModelView(models.Overview, db.session, name="Lottery History"))
+admin.add_view(MyView(name='New Lottery', endpoint='lottery'))
 
 import utils
 
@@ -214,7 +214,7 @@ def dates():
     lottery_id = db.session.query(models.Overview).filter_by(date=date_selected).first().lottery_id
     data_for_date_selected = db.session.query(models.Result).filter_by(lottery_id=lottery_id)
     df = utils.build_final_dataframe_for_page(data_for_date_selected)
-    return render_template('dates.html', date=date_selected, all_data=df)
+    return render_template('dates.html', date=":".join(date_selected.split(":")[:-1]), all_data=df)
 
 
 @app.route("/rotations", methods=['GET', 'POST'])
@@ -230,7 +230,7 @@ def rotations():
         winner_name = models.Result.query.filter_by(lottery_id=all_lottery_ids_for_rotation[idx]).order_by(
             models.Result.final_ranking.asc()).first().name
         all_winners.append(winner_name)
-    return render_template('rotations.html', all_dates=all_dates_for_rotation, all_winners=all_winners,
+    return render_template('rotations.html', all_dates=all_dates_for_rotation[::-1], all_winners=all_winners[::-1],
                            rotation_name=ROTATION_NAMES[int(rotation_selected) - 1])
 
 
@@ -245,14 +245,15 @@ def allocations():
         return render_template('error.html',
                                error="The total points allotted must not exceed {}".format(MAX_ALLOCATION_POINTS))
     else:
+        num_submissions = utils.save_points_for_given_user(current_user.email, allocations_list)
         try:
-            utils.save_points_for_given_user(current_user.email, allocations_list)
             emails.send_mail(subject=MAIL_CONFIG["update_subj"], recipient=current_user.email,
                              html_body=render_template('email/status.html', user=current_user.name,
                                                        points_remaining=str(MAX_ALLOCATION_POINTS - total_sum)))
         except Exception as e:
-            logging.error(f"failed to save points and send email for {current_user.email}: {e}")
-        return render_template('summary.html', rotation_numbers=ROTATION_NUMBERS, name=current_user.name)
+            logging.error(f"failed to send email for {current_user.email}: {e}")
+        return render_template('summary.html', rotation_numbers=ROTATION_NUMBERS, name=current_user.name,
+                               num_submissions_remaining=MAX_SUBMISSIONS - int(num_submissions))
 
 
 @app.route('/')
@@ -262,10 +263,11 @@ def index():
 
 @app.route('/profile')
 def profile():
-    points_results = utils.get_current_point_totals_for_user(current_user.email)
+    points_results, num_submissions = utils.get_current_point_totals_for_user(current_user.email)
     return render_template('profile.html', name=current_user.name, email=current_user.email,
                            max_points=MAX_ALLOCATION_POINTS, rotations=ROTATION_NUMBERS,
-                           points_results=points_results, rotation_names=ROTATION_NAMES)
+                           points_results=points_results, rotation_names=ROTATION_NAMES,
+                           num_submissions_remaining=MAX_SUBMISSIONS - num_submissions)
 
 
 @login_manager.user_loader

@@ -342,10 +342,10 @@
       <Owner>ypiigmhdmjcrgm</Owner>
       <IntrospectionStateNumber>10130247</IntrospectionStateNumber>
       <Current>1</Current>
-      <Relations>sequence|table|2910418|2910420|1
-sequence|table|2910431|2910433|1
-sequence|table|2769219|2769221|1
+      <Relations>sequence|table|2769219|2769221|1
 sequence|table|2769227|2769229|1
+sequence|table|2910418|2910420|1
+sequence|table|2910431|2910433|1
 </Relations>
     </database>
     <database id="86" parent="1" name="d21sl7uqkj99gt">

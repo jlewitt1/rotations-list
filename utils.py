@@ -69,20 +69,26 @@ def build_final_dataframe_for_page(data):
 
 
 def save_points_for_given_user(user_email, allocations_list):
-    current_user = models.Points.query.filter_by(email=user_email).first()
-    if current_user:  # if data already exists then update
-        current_user.points_one = allocations_list[0]
-        current_user.points_two = allocations_list[1]
-        current_user.points_three = allocations_list[2]
-        current_user.points_four = allocations_list[3]
-        current_user.points_five = allocations_list[4]
-        current_user.points_six = allocations_list[5]
-    else:
-        points_obj = models.Points(email=user_email, points_one=allocations_list[0], points_two=allocations_list[1],
-                                   points_three=allocations_list[2], points_four=allocations_list[3],
-                                   points_five=allocations_list[4], points_six=allocations_list[5])
+    current_user_points = models.Points.query.filter_by(email=user_email).first()
+    if current_user_points:  # if data already exists then update
+        num_submissions = current_user_points.num_submissions
+        current_user_points.points_one = allocations_list[0]
+        current_user_points.points_two = allocations_list[1]
+        current_user_points.points_three = allocations_list[2]
+        current_user_points.points_four = allocations_list[3]
+        current_user_points.points_five = allocations_list[4]
+        current_user_points.points_six = allocations_list[5]
+        current_user_points.num_submissions += 1
+        num_submissions += 1
+    else:  # adding points for the first time for this user
+        num_submissions = 0
+        points_obj = models.Points(email=user_email, points_one=allocations_list[0],
+                                   points_two=allocations_list[1], points_three=allocations_list[2],
+                                   points_four=allocations_list[3], points_five=allocations_list[4],
+                                   points_six=allocations_list[5])
         db.session.add(points_obj)
     db.session.commit()
+    return num_submissions
 
 
 def get_name_from_email(email):
@@ -118,19 +124,21 @@ def build_dataframe_for_given_rotation(rotation_number):
 
 
 def get_current_point_totals_for_user(user_email):
+    num_submissions = 0
     results = []
     query_results = db.session.query(models.Points).filter_by(email=user_email).first()
     if query_results:  # if user has already saved points in DB
+        num_submissions = query_results.num_submissions
         results = [query_results.points_one, query_results.points_two, query_results.points_three,
                    query_results.points_four, query_results.points_five, query_results.points_six]
-    return results
+    return results, num_submissions
 
 
 def generate_data_for_stats_page():
     results_list = db.session.query(models.Overview).all()
     dates_run = [result.date for result in results_list]
     rotations_run = list(set([result.rotation_number for result in results_list]))
-    return dates_run, rotations_run
+    return dates_run[::-1], rotations_run
 
 
 def generate_final_lottery_order_for_rotation(rotation_number, from_file):

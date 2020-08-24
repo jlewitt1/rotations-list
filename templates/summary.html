@@ -2,9 +2,12 @@
 
 {% block content %}
 <div class="col-md-12" style="text-align: left">
-    <h1>Thanks for submitting your points! </h1>
+    <h1>Thanks for submitting your points!</h1>
     <br/>
-    <h4>You can resubmit your point allocations at any time <span><a style="color: blue" href="{{ url_for('profile')}}">here</a></span> until an official lottery has been launched</h4>
+    <h4>You have <b>{{ num_submissions_remaining }}</b> submissions remaining</h4>
+    <br/>
+    <div>Click <a style="color: blue" href="{{ url_for('profile')}}">here</a> to return to your profile page</h4>
+    </div>
     <br/>
     <div class="col-md-12">
         <div>In the meantime, you can:</div>
