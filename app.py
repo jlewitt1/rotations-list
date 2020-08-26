@@ -168,7 +168,7 @@ def admin_lottery():
             utils.save_lottery_drawing_results_in_database(names, points, final_names_order, lottery_id)
             utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
             dates_run, rotations_run = utils.generate_data_for_stats_page()
-            return render_template('stats.html', dates=dates_run, rotations=rotations_run,
+            return render_template('stats_OLD.html', dates=dates_run, rotations=rotations_run,
                                    rotation_names=ROTATION_NAMES)
         except Exception as e:
             logging.error(f"Unable to save data in table: {e}")

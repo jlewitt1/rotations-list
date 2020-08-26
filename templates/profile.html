@@ -8,7 +8,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="title" style="text-align: left">
+<h1 style="text-align: left">
     Hi, {{ name }}!
 </h1>
 <div class="col-md-12" style="text-align: left">
@@ -22,14 +22,16 @@
             {% if num_submissions_remaining == 0 %}
             <div><b>Your points allocations have been locked</b></div>
             {% else %}
-            <div>You have <b>{{ num_submissions_remaining }}</b> more chance(s) to update your points allocations
+            <div>You have <b>{{ num_submissions_remaining }}</b> more chance to update your points allocations
             </div>
             {% endif %}
         </div>
-        <hr style="width:50%"/>
+        <br/>
+        <hr/>
         <div class="check-points">
             {% if num_submissions_remaining == 0 %}
             <div>Here is the breakdown of your final points allocations:</div>
+            <br/>
             <ul style="list-style: none;">
                 {% for result in points_results %}
                 <li>{{ rotation_names[loop.index-1] }}: <b>{{result}}</b></li>
@@ -38,6 +40,7 @@
             {% else %}
             {% if points_results %}
             <div>Here are the current points you have allocated:</div>
+            <br/>
             <ul style="list-style: none;">
                 {% for result in points_results %}
                 <li>{{ rotation_names[loop.index-1] }}: <b>{{result}}</b></li>
@@ -57,6 +60,7 @@
             <h1 style="font-weight: bold">OPTIONAL NEXT STEPS</h1>
             <br/>
             <div style="font-style: italic">Update your existing allocations</div>
+            <br/>
             {% else %}
             <h1 style="font-weight: bold">GETTING STARTED</h1>
             <br/>
@@ -64,22 +68,20 @@
             {% endif %}
         </div>
         <div class="next-steps">
-            <div class="input-group">
+            <div class="col-md-12">
                 <form name="{{name}}" action="/allocations" method="POST" enctype="multipart/form-data">
                     {% for rotation in rotations %}
-                    <label for="pointsInput">{{ rotation_names[loop.index-1] }}: </label>
                     {% if points_results %}
-                    <input type="range" name="{{rotation}}" id="pointsInput" value="{{points_results[loop.index -1]}}"
-                           min="1" max="25" onchange="updateTextInput(this);"/>
-                    <input type="text" id="textInput{{[loop.index -1]}}" value="{{points_results[loop.index -1]}}"
-                           style="background: none; border:none;color:white"/>
-                    <br/>
+                    <label for="pointsInput">{{ rotation_names[loop.index-1] }}:
+                        <input type="number" name="{{rotation}}" id="pointsInput"
+                               value="{{points_results[loop.index -1]}}"
+                               min="1" max="25" onchange="updateTextInput(this);"
+                               style="border:none;text-align: center; border-radius: 20px"/></label>
                     {% else %}
-                    <input type="range" name="{{rotation}}" id="pointsInput" value="5" min="1"
-                           max="25" onchange="updateTextInput(this);">
-                    <input type="text" id="textInput{{[loop.index -1]}}" value="5"
-                           style="background: none; border:none;color:white">
-                    <br/>
+                    <label for="pointsInput">{{ rotation_names[loop.index-1] }}
+                        <input type="number" name="{{rotation}}" id="pointsInput" value="5" min="1"
+                               max="25" onchange="updateTextInput(this);"
+                               style="border:none; text-align: center; border-radius: 20px"/></label>
                     {% endif %}
                     {% endfor %}
                     <br/>
@@ -97,15 +99,16 @@
               enctype="multipart/form-data">
             <div class="input-group">
                 <br/>
-                <span class="input-group-addon">Select a rotation number for running the lottery:</span>
-                <select name="rotation_select" class="selectpicker form-control">
+                <span class="input-group-addon">Select a rotation for running the lottery:</span>
+                <select name="rotation_select" class="selectpicker form-control" style="width: 50%;">
                     {% for rotation in rotations %}
-                    <option value="{{ rotation }}">{{ rotation }}</option>
+                    <option value="{{ rotation }}">{{ rotation_names[loop.index-1] }}</option>
                     {% endfor %}
                 </select>
             </div>
             <br/>
             <input type="submit" value="Launch Lottery"/>
+            <br/><br/>
         </form>
         {% endif %}
     </div>

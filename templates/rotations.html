@@ -1,32 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Results By Rotation</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Results by Rotation</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" href="../static/css/main.css"/>
 </head>
+
 <body>
-<div class="container">
-    <div class="col-md-12">
-        <br/>
+<div id="page-wrapper">
+    <div class="container">
         <div class="col-md-12">
-            <h4>Rotation Selected: {{ rotation_name }}</h4>
+            <br/>
+            <h3>Rotation Selected: {{ rotation_name }}</h3>
             <br/>
             <div class="results-holder">
                 <div>Lottery winners by date:</div>
                 <br/>
-                <ul style="list-style: none; max-height: 350px; overflow:auto; width:50%">
+                <ul style="list-style: none; max-height: 500px; overflow:auto; width:50%">
                     {% for date in all_dates %}
                     <li>{{ date.strftime('%Y-%m-%d, %H:%M') }}: <b>{{ all_winners[loop.index - 1] }}</b></li>
                     {% endfor %}
                 </ul>
             </div>
             <br/>
+            <div>Click <span><a href="{{ url_for('stats')}}">here</a></span> to go back</div>
+            <br/>
         </div>
-        <br/>
-        <div>Click <span><a href="{{ url_for('stats')}}">here</a></span> to go back</div>
     </div>
 </div>
 </body>

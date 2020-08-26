@@ -1,24 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Results By Date</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <title>Results by Date</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" href="../static/css/main.css"/>
 </head>
+
 <body>
-<div class="container">
-    <div class="col-md-12">
-        <br/>
+<div id="page-wrapper">
+    <div class="container">
         <div class="col-md-12">
-            <h4>Lottery Date: {{ date }}</h4>
+            <br/>
+            <h3>Lottery Date: {{ date }}</h3>
             <br/>
             {{ all_data.to_html(classes="table table-striped") | safe}}
             <br/>
+            <br/>
+            <div>Click <span><a href="{{ url_for('stats')}}">here</a></span> to go back</div>
+            <br/>
         </div>
-        <br/>
-        <div>Click <span><a href="{{ url_for('stats')}}">here</a></span> to go back</div>
     </div>
 </div>
 </body>

@@ -1,58 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Lottery</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css"/>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" href="../static/css/main.css"/>
 </head>
 
-<body>
-<div class="hero is-primary is-fullheight">
-    <div class="hero-head">
-        <nav class="navbar">
-            <div class="container">
-                <div id="navbarMenuHeroA" class="navbar-menu">
-                    <div class="navbar-end">
-                        <a href="{{ url_for('main.index') }}" class="navbar-item">
-                            Home
-                        </a>
-                        {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('main.profile') }}" class="navbar-item">
-                            Profile
-                        </a>
-                        {% endif %}
-                        {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('admin.index') }}" class="navbar-item">
-                            Admin
-                        </a>
-                        {% endif %}
-                        {% if not current_user.is_authenticated %}
-                        <a href="{{ url_for('auth.login') }}" class="navbar-item">
-                            Login
-                        </a>
-                        <a href="{{ url_for('auth.signup') }}" class="navbar-item">
-                            Sign Up
-                        </a>
-                        {% endif %}
-                        {% if current_user.is_authenticated %}
-                        <a href="{{ url_for('auth.logout') }}" class="navbar-item">
-                            Logout
-                        </a>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+<body class="homepage is-preload">
+<div id="page-wrapper">
+    <!-- Nav -->
+    <div class="container">
+        <nav id="nav" style="text-align: center">
+            <ul>
+                <li>
+                    <a href="{{ url_for('main.index') }}" class="icon solid fa-home">
+                        <span>Home</span>
+                    </a>
+                </li>
+                {% if current_user.is_authenticated %}
+                <li>
+                    <a href="{{ url_for('main.profile') }}" class="icon solid fa-user-friends">
+                        <span>Profile</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if current_user.is_authenticated %}
+
+                <li>
+                    <a href="{{ url_for('admin.index') }}" class="icon solid fa-user-shield">
+                        <span>Admin</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if not current_user.is_authenticated %}
+                <li>
+                    <a href="{{ url_for('auth.login') }}" class="icon solid fa-sign-in-alt">
+                        <span>Login</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if not current_user.is_authenticated %}
+                <li>
+                    <a href="{{ url_for('auth.signup') }}" class="icon solid fa-user-plus">
+                        <span>Sign Up</span>
+                    </a>
+                </li>
+                {% endif %}
+                {% if current_user.is_authenticated %}
+                <li>
+                    <a href="{{ url_for('auth.logout') }}" class="icon solid fa-sign-out-alt">
+                        <span>Logout</span>
+                    </a>
+                </li>
+                {% endif %}
+
+            </ul>
         </nav>
     </div>
-    <div class="hero-body">
-        <div class="container has-text-centered">
-            {% block content %}
-            {% endblock %}
-        </div>
-    </div>
 </div>
+<br/><br/><br/><br/><br/><br/><br/>
+<section>
+    <div class="container">
+        {% block content %}
+        {% endblock %}
+    </div>
+</section>
+<!-- Scripts -->
+<script src="../static/js/jquery.min.js"></script>
+<script src="../static/js/jquery.dropotron.min.js"></script>
+<script src="../static/js/browser.min.js"></script>
+<script src="../static/js/breakpoints.min.js"></script>
+<script src="../static/js/util.js"></script>
+<script src="../static/js/main.js"></script>
+
 </body>
 
 </html>
