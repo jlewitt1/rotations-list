@@ -91,13 +91,13 @@ def save_points_for_given_user(user_email, allocations_list):
     return num_submissions
 
 
+def generate_full_name(first_name, last_name):
+    return first_name + " " + last_name
+
+
 def get_name_from_email(email):
-    res = db.session.query(models.User).filter_by(email=email).first().name
-    return res
-
-
-def get_email_from_name(name):
-    res = db.session.query(models.User).filter_by(name=name).first().email
+    query = db.session.query(models.User).filter_by(email=email).first()
+    res = generate_full_name(query.first_name, query.last_name)
     return res
 
 
@@ -154,5 +154,6 @@ def generate_final_lottery_order_for_rotation(rotation_number, from_file):
 
 def get_all_mail_recipients():
     query_result = db.session.query(models.User).all()
-    all_users = [{"name": result.name, "email": result.email} for result in query_result]
+    all_users = [{"name": generate_full_name(result.first_name, result.last_name), "email": result.email} for result in
+                 query_result]
     return all_users

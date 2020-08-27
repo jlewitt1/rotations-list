@@ -13,7 +13,6 @@ from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG, ROTATIO
 logging = logging.getLogger(__name__)
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
-
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"max_overflow": 15, "pool_pre_ping": True, "pool_recycle": 60 * 60,
                                            "pool_size": 30}
@@ -41,7 +40,7 @@ class MyView(BaseView):
 
 class UserModelView(ModelView):
     can_edit = False
-    column_list = ('name', 'email')
+    column_list = ('first_name', 'last_name', 'email')
 
     def is_accessible(self):
         return current_user.is_authenticated
@@ -169,7 +168,7 @@ def admin_lottery():
             utils.save_lottery_drawing_results_in_database(names, points, final_names_order, lottery_id)
             utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
             dates_run, rotations_run = utils.generate_data_for_stats_page()
-            return render_template('stats_OLD.html', dates=dates_run, rotations=rotations_run,
+            return render_template('stats.html', dates=dates_run, rotations=rotations_run,
                                    rotation_names=ROTATION_NAMES)
         except Exception as e:
             logging.error(f"Unable to save data in table: {e}")
@@ -250,11 +249,11 @@ def allocations():
         num_submissions = utils.save_points_for_given_user(current_user.email, allocations_list)
         try:
             emails.send_mail(subject=MAIL_CONFIG["update_subj"], recipient=current_user.email,
-                             html_body=render_template('email/status.html', user=current_user.name,
+                             html_body=render_template('email/status.html', user=current_user.first_name,
                                                        points_remaining=str(MAX_ALLOCATION_POINTS - total_sum)))
         except Exception as e:
             logging.error(f"failed to send email for {current_user.email}: {e}")
-        return render_template('summary.html', rotation_numbers=ROTATION_NUMBERS, name=current_user.name,
+        return render_template('summary.html', rotation_numbers=ROTATION_NUMBERS, name=current_user.first_name,
                                num_submissions_remaining=MAX_SUBMISSIONS - int(num_submissions))
 
 
@@ -266,7 +265,7 @@ def index():
 @app.route('/profile')
 def profile():
     points_results, num_submissions = utils.get_current_point_totals_for_user(current_user.email)
-    return render_template('profile.html', name=current_user.name, email=current_user.email,
+    return render_template('profile.html', name=current_user.first_name, email=current_user.email,
                            max_points=MAX_ALLOCATION_POINTS, rotations=ROTATION_NUMBERS,
                            points_results=points_results, rotation_names=ROTATION_NAMES,
                            num_submissions_remaining=MAX_SUBMISSIONS - num_submissions)

@@ -29,7 +29,7 @@
     <database id="7" parent="1" name="rotations">
       <ObjectId>58183</ObjectId>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>3227</IntrospectionStateNumber>
+      <IntrospectionStateNumber>3237</IntrospectionStateNumber>
       <Current>1</Current>
       <Relations>sequence|table|58189|58191|1
 sequence|table|58197|58199|1
@@ -107,7 +107,7 @@ sequence|table|58221|58223|1
       <Comment>standard public schema</Comment>
       <StateNumber>360</StateNumber>
       <Owner>postgres</Owner>
-      <IntrospectionStateNumber>3228</IntrospectionStateNumber>
+      <IntrospectionStateNumber>3238</IntrospectionStateNumber>
       <Current>1</Current>
     </schema>
     <access-method id="24" parent="7" name="btree">
@@ -221,7 +221,7 @@ sequence|table|58221|58223|1
     <table id="39" parent="23" name="user">
       <ObjectId>58210</ObjectId>
       <Owner>jlewittes</Owner>
-      <StateNumber>3050</StateNumber>
+      <StateNumber>3236</StateNumber>
     </table>
     <column id="40" parent="35" name="version_num">
       <Position>1</Position>
@@ -432,33 +432,45 @@ sequence|table|58221|58223|1
       <StateNumber>3050</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <column id="72" parent="39" name="name">
-      <Position>4</Position>
+    <column id="72" parent="39" name="first_name">
+      <Position>5</Position>
       <DataType>varchar(1000)|0s</DataType>
-      <StateNumber>3050</StateNumber>
+      <StateNumber>3236</StateNumber>
       <TypeId>1043</TypeId>
     </column>
-    <index id="73" parent="39" name="user_pkey">
+    <column id="73" parent="39" name="last_name">
+      <Position>6</Position>
+      <DataType>varchar(1000)|0s</DataType>
+      <StateNumber>3236</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <column id="74" parent="39" name="organization">
+      <Position>7</Position>
+      <DataType>varchar(1000)|0s</DataType>
+      <StateNumber>3236</StateNumber>
+      <TypeId>1043</TypeId>
+    </column>
+    <index id="75" parent="39" name="user_pkey">
       <ObjectId>58217</ObjectId>
       <StateNumber>3050</StateNumber>
       <ColNames>id</ColNames>
       <Unique>1</Unique>
       <Primary>1</Primary>
     </index>
-    <index id="74" parent="39" name="user_email_key">
+    <index id="76" parent="39" name="user_email_key">
       <ObjectId>58219</ObjectId>
       <StateNumber>3050</StateNumber>
       <ColNames>email</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="75" parent="39" name="user_pkey">
+    <key id="77" parent="39" name="user_pkey">
       <ObjectId>58218</ObjectId>
       <StateNumber>3050</StateNumber>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
       <UnderlyingIndexName>user_pkey</UnderlyingIndexName>
     </key>
-    <key id="76" parent="39" name="user_email_key">
+    <key id="78" parent="39" name="user_email_key">
       <ObjectId>58220</ObjectId>
       <StateNumber>3050</StateNumber>
       <ColNames>email</ColNames>

@@ -16,7 +16,7 @@ def index():
 @login_required
 def profile():
     points_results, num_submissions = get_current_point_totals_for_user(current_user.email)
-    return render_template('profile.html', name=current_user.name, email=current_user.email,
+    return render_template('profile.html', name=current_user.first_name, email=current_user.email,
                            max_points=MAX_ALLOCATION_POINTS, rotations=ROTATION_NUMBERS,
                            points_results=points_results, rotation_names=ROTATION_NAMES,
                            num_submissions_remaining=MAX_SUBMISSIONS - num_submissions)

@@ -34,7 +34,9 @@ def login_post():
 @auth.route('/signup', methods=['POST'])
 def signup_post():
     email = request.form.get('email')
-    name = request.form.get('name')
+    first_name = request.form.get('first_name')
+    last_name = request.form.get('last_name')
+    organization = request.form.get('organization')
     password = request.form.get('password')
 
     # check email already exists in database
@@ -45,14 +47,15 @@ def signup_post():
         return redirect(url_for('auth.signup'))
 
     # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-    new_user = models.User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
+    new_user = models.User(email=email, first_name=first_name, last_name=last_name,
+                           password=generate_password_hash(password, method='sha256'))
 
     # add the new user to the database
     db.session.add(new_user)
     db.session.commit()
     try:
         emails.send_mail(subject=MAIL_CONFIG["welcome_subj"], recipient=email,
-                         html_body=render_template('email/welcome.html', user=name))
+                         html_body=render_template('email/welcome.html', user=first_name))
     except Exception as e:
         logging.error(f"Failed to send mail to {email}: {e}")
     return redirect(url_for('auth.login'))
