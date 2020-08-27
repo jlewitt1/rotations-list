@@ -13,6 +13,7 @@ from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG, ROTATIO
 logging = logging.getLogger(__name__)
 app = Flask(__name__)
 app.config.from_object(os.environ['APP_SETTINGS'])
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {"max_overflow": 15, "pool_pre_ping": True, "pool_recycle": 60 * 60,
                                            "pool_size": 30}

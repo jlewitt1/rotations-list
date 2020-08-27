@@ -20,7 +20,7 @@
         <br/>
         <div class="check-submissions">
             {% if num_submissions_remaining == 0 %}
-            <div><b>Your points allocations have been locked</b></div>
+            <div><b>Your points allocations have been locked <span class="icon solid fa-lock"></span></b></div>
             {% else %}
             <div>You have <b>{{ num_submissions_remaining }}</b> more chance to update your points allocations
             </div>
@@ -94,7 +94,7 @@
     </div>
     <div class="fake-lottery">
         {% if points_results %}
-        <div style="font-style: italic">Run an unofficial/test lottery to see how it works</div>
+        <div style="font-style: italic">Curious to see how the lottery works? Run an unofficial/test lottery below</div>
         <form action="/lottery" method="POST"
               enctype="multipart/form-data">
             <div class="input-group">

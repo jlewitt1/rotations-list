@@ -46,7 +46,7 @@
                             <span class="input-group-addon">Select a rotation</span>
                             <select name="rotation_select" class="selectpicker form-control">
                                 {% for rotation in rotations %}
-                                <option value="{{ rotation }}">{{ rotation_names[loop.index-1] }}</option>
+                                <option value="{{ rotation }}">{{ rotation_names[rotation-1] }}</option>
                                 {% endfor %}
                             </select>
                         </div>
