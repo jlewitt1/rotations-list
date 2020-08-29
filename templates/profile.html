@@ -92,26 +92,26 @@
         {% endif %}
         <br/>
     </div>
-    <div class="fake-lottery">
-        {% if points_results %}
-        <div style="font-style: italic">Curious to see how the lottery works? Run an unofficial/test lottery below</div>
-        <form action="/lottery" method="POST"
-              enctype="multipart/form-data">
-            <div class="input-group">
-                <br/>
-                <span class="input-group-addon">Select a rotation for running the lottery:</span>
-                <select name="rotation_select" class="selectpicker form-control" style="width: 50%;">
-                    {% for rotation in rotations %}
-                    <option value="{{ rotation }}">{{ rotation_names[loop.index-1] }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <br/>
-            <input type="submit" value="Launch Lottery"/>
-            <br/><br/>
-        </form>
-        {% endif %}
-    </div>
+<!--    <div class="fake-lottery">-->
+<!--        {% if points_results %}-->
+<!--        <div style="font-style: italic">Curious to see how the lottery works? Run an unofficial/test lottery below</div>-->
+<!--        <form action="/lottery" method="POST"-->
+<!--              enctype="multipart/form-data">-->
+<!--            <div class="input-group">-->
+<!--                <br/>-->
+<!--                <span class="input-group-addon">Select a rotation for running the lottery:</span>-->
+<!--                <select name="rotation_select" class="selectpicker form-control" style="width: 50%;">-->
+<!--                    {% for rotation in rotations %}-->
+<!--                    <option value="{{ rotation }}">{{ rotation_names[loop.index-1] }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </select>-->
+<!--            </div>-->
+<!--            <br/>-->
+<!--            <input type="submit" value="Launch Lottery"/>-->
+<!--            <br/><br/>-->
+<!--        </form>-->
+<!--        {% endif %}-->
+<!--    </div>-->
 </div>
 </div>
 {% endblock %}
