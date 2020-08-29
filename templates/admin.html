@@ -9,14 +9,14 @@
 </head>
 <body>
 <script>
-    function getRotationData(rotationSelected) {
+    function getRotationData(rotationSelected, schoolSelected) {
         // handle retrieval or rotation data based on user selection
         $('#data-href').click(function (event) {
             event.preventDefault();
             $.ajax({
                 type: 'POST',
                 url: '/lottery_participants',
-                data: {"rotation": rotationSelected},
+                data: {"rotation": rotationSelected, "school":schoolSelected},
                 success: function (allParticipants) {
                     listSelector = $("#listSelector");
                     $.each(allParticipants, function (index, participant) {
@@ -52,6 +52,15 @@
                 <form action="/admin_lottery" method="POST"
                       enctype="multipart/form-data">
                     <div class="input-group">
+                        <span class="input-group-addon">Select a Medical School</span>
+                        <select name="school_select" id="school-selected" class="selectpicker form-control">
+                            {% for organization in organizations %}
+                            <option value="{{ organization }}">{{ organizations[loop.index-1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br/>
+                    <div class="input-group">
                         <span class="input-group-addon">Select a rotation</span>
                         <select name="rotation_select" id="rotation-selected" class="selectpicker form-control">
                             {% for rotation in rotation_numbers %}
@@ -60,7 +69,8 @@
                         </select>
                     </div>
                     <br/>
-                    <div>Click <span><a id="data-href" href="javascript:getRotationData($('#rotation-selected').val())">here</a></span>
+                    <div>Click <span><a id="data-href"
+                                        href="javascript:getRotationData($('#rotation-selected').val(), $('#school-selected').val())">here</a></span>
                         to see all participants and allocations
                     </div>
                     <br/>
@@ -75,11 +85,20 @@
             <div class="col-md-12">
                 <hr style="color:black">
                 <h4 style="font-style: italic">Option 2: Upload file to start lottery</h4>
-                <div>Data from this file will not be saved </div>
+                <div>Data from this file will not be saved</div>
                 <div style="font-style: italic">*Note: columns must include the headers "Name" and "Points"</div>
                 <br/>
                 <form action="/results" method="POST"
                       enctype="multipart/form-data">
+                    <div class="input-group">
+                        <span class="input-group-addon">Select a Medical School</span>
+                        <select name="school_select" id="school-selected" class="selectpicker form-control">
+                            {% for organization in organizations %}
+                            <option value="{{ organization }}">{{ organizations[loop.index-1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br/>
                     <div class="input-group">
                         <span class="input-group-addon">Select a rotation</span>
                         <select name="rotation_select" class="selectpicker form-control">

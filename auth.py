@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import login_user, logout_user, login_required
 import logging
-from config import MAIL_CONFIG
+from config import MAIL_CONFIG, DEFAULT_SCHOOL
 import emails
 
 logging = logging.getLogger(__name__)
@@ -37,6 +37,8 @@ def signup_post():
     first_name = request.form.get('first_name')
     last_name = request.form.get('last_name')
     organization = request.form.get('organization')
+    if organization == '':
+        organization = DEFAULT_SCHOOL
     password = request.form.get('password')
 
     # check email already exists in database
@@ -47,7 +49,7 @@ def signup_post():
         return redirect(url_for('auth.signup'))
 
     # create a new user with the form data. Hash the password so the plaintext version isn't saved.
-    new_user = models.User(email=email, first_name=first_name, last_name=last_name,
+    new_user = models.User(email=email, first_name=first_name, last_name=last_name, organization=organization,
                            password=generate_password_hash(password, method='sha256'))
 
     # add the new user to the database

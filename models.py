@@ -31,11 +31,13 @@ class Overview(db.Model):
     lottery_id = db.Column(UUID)
     date = db.Column(db.DateTime)
     rotation_number = db.Column(db.Integer)
+    organization = db.Column(db.String(1000))
 
-    def __init__(self, lottery_id, rotation_number):
+    def __init__(self, lottery_id, rotation_number, organization):
         self.lottery_id = lottery_id
         self.rotation_number = rotation_number
         self.date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(tz=None)
+        self.organization = organization
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -78,12 +80,12 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(1000))
     organization = db.Column(db.String(1000))
 
-    def __init__(self, email, password, first_name, last_name):
+    def __init__(self, email, password, first_name, last_name, organization):
         self.email = email
         self.password = password
         self.first_name = first_name
         self.last_name = last_name
-        self.organization = 'Beer Sheva'
+        self.organization = organization
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

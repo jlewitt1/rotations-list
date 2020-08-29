@@ -13,62 +13,87 @@
     <div class="container">
         <div class="col-md-12">
             <br/>
-            <br/>
-            <h4><strong>Past Lottery Results</strong></h4>
-            <br/>
-            <h3>There have been <b>{{dates|length}}</b> lotteries across <b>{{rotations|length}}</b> rotations</h3>
-            <br/>
-            <div class="col-md-6" style="width:50%">
-                <h4>Filter by date run:</h4>
+            {% if school_selected %}
+            <div class="school-results">
+                {% if dates|length == 0 %}
+                <h4><strong>No Lottery Results for {{ school_selected }}</strong></h4>
                 <br/>
-                <form class="form-inline" method="POST" action="{{ url_for('dates') }}">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon">Select a date</span>
-                            <select size="10" name="date_select" class="selectpicker form-control">
-                                {% for date in dates %}
-                                <option value="{{ date }}">{{ date.strftime('%Y-%m-%d, %H:%M') }}</option>
-                                {% endfor %}
-                            </select>
+                <h5>Check another school for past lottery results</h5>
+                <div class="col-md-12"><br/>Click <span><a href="{{ url_for('stats')}}">here</a></span> to try a
+                    different school
+                </div>
+                {% else %}
+                <h4><strong>Past Lottery Results for {{ school_selected }}</strong></h4>
+                <br/>
+                <h3>There have been <b>{{dates|length}}</b> lotteries across <b>{{rotations|length}}</b> rotations</h3>
+                <br/>
+                <div class="col-md-6" style="width:50%">
+                    <h4>Filter by date run:</h4>
+                    <br/>
+                    <form class="form-inline" method="POST" action="{{ url_for('dates') }}">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Select a date</span>
+                                <select size="10" name="date_select" class="selectpicker form-control">
+                                    {% for date in dates %}
+                                    <option value="{{ date }}">{{ date.strftime('%Y-%m-%d, %H:%M') }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <br/>
+                            <button type="submit" class="btn btn-default">Go</button>
                         </div>
-                        <br/>
-                        <button type="submit" class="btn btn-default">Go</button>
-                    </div>
-                </form>
-            </div>
-            <div class="col-md-6" style="width: 50%">
-                <br/>
-                <h4>Filter by rotation:</h4>
-                <br/>
-                <form class="form-inline" method="POST" action="{{ url_for('rotations') }}">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <span class="input-group-addon">Select a rotation</span>
-                            <select name="rotation_select" class="selectpicker form-control">
-                                {% for rotation in rotations %}
-                                <option value="{{ rotation }}">{{ rotation_names[rotation-1] }}</option>
-                                {% endfor %}
-                            </select>
+                    </form>
+                </div>
+                <div class="col-md-6" style="width: 50%">
+                    <br/>
+                    <h4>Filter by rotation:</h4>
+                    <br/>
+                    <form class="form-inline" method="POST" action="{{ url_for('rotations') }}">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <span class="input-group-addon">Select a rotation</span>
+                                <select name="rotation_select" class="selectpicker form-control">
+                                    {% for rotation in rotations %}
+                                    <option value="{{ rotation }}">{{ rotation_names[rotation-1] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <br/>
+                            <button type="submit" class="btn btn-default">Go</button>
                         </div>
-                        <br/>
-                        <button type="submit" class="btn btn-default">Go</button>
-                    </div>
-                </form>
+                    </form>
+                </div>
+                <br/>
+                <div class="col-md-12"><br/>Click <span><a href="{{ url_for('stats')}}">here</a></span> to go back
+                </div>
+                {% endif %}
             </div>
-            <br/>
+            {% else %}
+            <div class="select-school">
+                <h4>Please select a school to view lottery results</h4>
+                <br/>
+                <form action="/school_results" method="POST" enctype="multipart/form-data">
+                    <div class="input-group">
+                        <span class="input-group-addon">Medical School</span>
+                        <select name="school_select" id="school-selected" class="selectpicker form-control">
+                            {% for organization in organizations %}
+                            <option value="{{ organization }}">{{ organizations[loop.index-1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br/>
+                    <input type="submit" value="View Results"/>
+                </form>
+
+            </div>
+            <div class="col-md-12"><br/>Click <span><a href="{{ url_for('profile')}}">here</a></span> to go back</div>
+            {% endif %}
+
         </div>
-        <div class="col-md-12"><br/>Click <span><a href="{{ url_for('profile')}}">here</a></span> to go back</div>
         <br/>
     </div>
 </div>
-<!--<br/><br/><br/><br/><br/><br/><br/>-->
-<!--<section>-->
-<!--    <div class="container">-->
-<!--        {% block content %}-->
-<!--        {% endblock %}-->
-<!--    </div>-->
-<!--</section>-->
-
 </body>
 
 </html>

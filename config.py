@@ -10,6 +10,8 @@ MAIL_CONFIG = {
     "update_subj": "Lottery System: Points Allocation Update",
     "welcome_subj": "Welcome to the Lottery System"
 }
+DEFAULT_SCHOOL = 'Ben Gurion'
+ALL_SCHOOLS = [DEFAULT_SCHOOL, 'Sackler', 'Hebrew U', 'Technion']
 
 
 class Config(object):

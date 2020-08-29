@@ -8,7 +8,7 @@ from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
-from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG, ROTATION_NAMES, MAX_SUBMISSIONS
+from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG, ROTATION_NAMES, MAX_SUBMISSIONS, ALL_SCHOOLS
 
 logging = logging.getLogger(__name__)
 app = Flask(__name__)
@@ -35,12 +35,15 @@ class MyView(BaseView):
 
     @expose('/')
     def index(self):
-        return self.render('admin.html', rotation_numbers=ROTATION_NUMBERS, rotation_names=ROTATION_NAMES)
+        return self.render('admin.html', rotation_numbers=ROTATION_NUMBERS, rotation_names=ROTATION_NAMES,
+                           organizations=ALL_SCHOOLS)
 
 
 class UserModelView(ModelView):
     can_edit = False
-    column_list = ('first_name', 'last_name', 'email')
+    column_list = ('first_name', 'last_name', 'email', 'organization')
+    column_labels = dict(first_name='First Name', last_name='Last Name', email='Email',
+                         organization='Medical School')
 
     def is_accessible(self):
         return current_user.is_authenticated
@@ -86,6 +89,8 @@ class PointsModelView(ModelView):
 class OverviewModelView(ModelView):
     can_create = False
     can_edit = False
+    column_list = ('date', 'rotation_number', 'organization')
+    column_labels = dict(date='Date', rotation_number='Rotation Number', organization='School Name')
 
     def is_accessible(self):
         return current_user.is_authenticated
@@ -144,11 +149,14 @@ def results():
         try:
             file_received = request.files['file']
             rotation_number = int(request.form.get('rotation_select'))
+            school_selected = request.form.get('school_select')
             names, points, final_names_order = utils.generate_final_lottery_order_for_rotation(rotation_number,
+                                                                                               school_selected,
                                                                                                from_file=file_received)
             lottery_id = str(uuid.uuid4())
             utils.save_lottery_drawing_results_in_database(names, points, final_names_order, lottery_id)
-            utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
+            utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number,
+                                                         school_selected=school_selected)
             return render_template('results.html', names=final_names_order, all_data={"names": names,
                                                                                       "weights": points})
         except Exception as e:
@@ -163,13 +171,17 @@ def admin_lottery():
         try:
             lottery_id = str(uuid.uuid4())
             rotation_number = int(request.form.get('rotation_select'))
+            school_selected = request.form.get('school_select')
             names, points, final_names_order = utils.generate_final_lottery_order_for_rotation(rotation_number,
+                                                                                               school_selected,
                                                                                                from_file=False)
             utils.save_lottery_drawing_results_in_database(names, points, final_names_order, lottery_id)
-            utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number)
-            dates_run, rotations_run = utils.generate_data_for_stats_page()
+            utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number,
+                                                         school_selected=school_selected)
+            dates_run, rotations_run = utils.generate_data_for_stats_page(school_selected)
             return render_template('stats.html', dates=dates_run, rotations=rotations_run,
-                                   rotation_names=ROTATION_NAMES)
+                                   rotation_names=ROTATION_NAMES, school_selected=school_selected,
+                                   organizations=ALL_SCHOOLS)
         except Exception as e:
             logging.error(f"Unable to save data in table: {e}")
             return render_template('error.html', error=str(e))
@@ -181,7 +193,9 @@ def lottery():
     if request.method == 'POST':
         try:
             rotation_number = int(request.form.get('rotation_select'))
+            school_selected = request.form.get('school_select')
             names, points, final_names_order = utils.generate_final_lottery_order_for_rotation(rotation_number,
+                                                                                               school_selected,
                                                                                                from_file=False)
             return render_template('results.html', names=final_names_order, all_data={"names": names,
                                                                                       "weights": points})
@@ -193,17 +207,27 @@ def lottery():
 @app.route('/stats')
 def stats():
     """main stats page showing all dates for lotteries run and all rotations represented"""
-    dates_run, rotations_run = utils.generate_data_for_stats_page()
-    return render_template('stats.html', dates=dates_run, rotations=rotations_run, rotation_names=ROTATION_NAMES)
+    dates_run, rotations_run = utils.generate_data_for_stats_page(school_selected=None)
+    return render_template('stats.html', dates=dates_run, rotations=rotations_run, rotation_names=ROTATION_NAMES,
+                           school_selected=None, organizations=ALL_SCHOOLS)
+
+
+@app.route('/school_results', methods=['POST'])
+def school_results():
+    school_selected = request.form.get('school_select')
+    dates_run, rotations_run = utils.generate_data_for_stats_page(school_selected)
+    return render_template('stats.html', dates=dates_run, rotations=rotations_run, rotation_names=ROTATION_NAMES,
+                           school_selected=school_selected, organizations=ALL_SCHOOLS)
 
 
 @app.route('/lottery_participants', methods=['POST'])
 def lottery_participants():
     """retrieves the participants and allocations for a given rotation"""
     rotation_number = int(request.form['rotation'])
-    df = utils.build_dataframe_for_given_rotation(rotation_number)
+    school_selected = request.form['school']
+    df = utils.build_dataframe_for_given_rotation(rotation_number, school_selected)
     if df.empty:
-        return f"Currently no participants for rotation {rotation_number}"
+        return f"Currently no participants for rotation {rotation_number} in {school_selected}"
     # if there is data for given rotation
     return jsonify(df.to_dict('records'))
 

@@ -52,8 +52,8 @@ def save_lottery_drawing_results_in_database(names, weights, final_names_order, 
     db.session.commit()
 
 
-def save_lottery_overview_info_in_database(lottery_id, rotation_number):
-    overview_obj = models.Overview(lottery_id=lottery_id, rotation_number=rotation_number)
+def save_lottery_overview_info_in_database(lottery_id, rotation_number, school_selected):
+    overview_obj = models.Overview(lottery_id=lottery_id, rotation_number=rotation_number, organization=school_selected)
     db.session.add(overview_obj)
     db.session.commit()
 
@@ -101,26 +101,39 @@ def get_name_from_email(email):
     return res
 
 
-def build_dataframe_for_given_rotation(rotation_number):
+def get_school_from_email(email):
+    return db.session.query(models.User).filter_by(email=email).first().organization
+
+
+def build_dataframe_for_given_rotation(rotation_number, school_selected):
     if rotation_number == 1:
         result = db.session.query(models.Points.email, models.Points.points_one)
-        res = [{"Name": get_name_from_email(user.email), "Points": user.points_one} for user in result]
+        res = [{"Name": get_name_from_email(user.email), "Points": user.points_one,
+                "Organization": get_school_from_email(user.email)} for user in result]
     elif rotation_number == 2:
         result = db.session.query(models.Points.email, models.Points.points_two)
-        res = [{"Name": get_name_from_email(user.email), "Points": user.points_two} for user in result]
+        res = [{"Name": get_name_from_email(user.email), "Points": user.points_two,
+                "Organization": get_school_from_email(user.email)} for user in result]
     elif rotation_number == 3:
         result = db.session.query(models.Points.email, models.Points.points_three)
-        res = [{"Name": get_name_from_email(user.email), "Points": user.points_three} for user in result]
+        res = [{"Name": get_name_from_email(user.email), "Points": user.points_three,
+                "Organization": get_school_from_email(user.email)} for user in result]
     elif rotation_number == 4:
         result = db.session.query(models.Points.email, models.Points.points_four)
-        res = [{"Name": get_name_from_email(user.email), "Points": user.points_four} for user in result]
+        res = [{"Name": get_name_from_email(user.email), "Points": user.points_four,
+                "Organization": get_school_from_email(user.email)} for user in result]
     elif rotation_number == 5:
         result = db.session.query(models.Points.email, models.Points.points_five)
-        res = [{"Name": get_name_from_email(user.email), "Points": user.points_five} for user in result]
+        res = [{"Name": get_name_from_email(user.email), "Points": user.points_five,
+                "Organization": get_school_from_email(user.email)} for user in result]
     else:
         result = db.session.query(models.Points.email, models.Points.points_six)
-        res = [{"Name": get_name_from_email(user.email), "Points": user.points_six} for user in result]
-    return pd.DataFrame(res)
+        res = [{"Name": get_name_from_email(user.email), "Points": user.points_six,
+                "Organization": get_school_from_email(user.email)} for user in result]
+
+    df = pd.DataFrame(res)
+    df = df.loc[df['Organization'] == school_selected]
+    return df
 
 
 def get_current_point_totals_for_user(user_email):
@@ -134,18 +147,18 @@ def get_current_point_totals_for_user(user_email):
     return results, num_submissions
 
 
-def generate_data_for_stats_page():
-    results_list = db.session.query(models.Overview).all()
+def generate_data_for_stats_page(school_selected):
+    results_list = db.session.query(models.Overview).filter_by(organization=school_selected).all()
     dates_run = [result.date for result in results_list]
     rotations_run = list(set([result.rotation_number for result in results_list]))
     return dates_run[::-1], rotations_run
 
 
-def generate_final_lottery_order_for_rotation(rotation_number, from_file):
+def generate_final_lottery_order_for_rotation(rotation_number, school_selected, from_file):
     if from_file:
         df = pd.read_excel(from_file)
     else:
-        df = build_dataframe_for_given_rotation(rotation_number)
+        df = build_dataframe_for_given_rotation(rotation_number, school_selected)
     names, points = get_names_and_points(df)
     final_names_order = generate_order(names, [points])
 
