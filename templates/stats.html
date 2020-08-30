@@ -14,6 +14,8 @@
 <script>
 
     function getClassData() {
+        $("#date_select").html('')
+        $("#rotation_select").html('')
         let yearSelected = $('#class_select').find(":selected").text();
         $.ajax({
             type: 'POST',
@@ -21,13 +23,9 @@
             data: {"school": schoolSelected, "year": yearSelected},
             success: function (res) {
                 let datesRun = res['dates_run'];
-                console.log("datesRun", datesRun)
-                if (datesRun.length > 0) {
-
+                if (datesRun.length > 0) { //if data exists for given year
                     let rotationsRun = res['rotations_run'];
                     let rotationNames = res['rotation_names']
-                    console.log("rotationNames", rotationNames)
-                    console.log("rotationsRun", rotationsRun)
 
                     let datesList = document.getElementById('date_select').options;
                     let rotationsList = document.getElementById('rotation_select').options;
@@ -54,7 +52,6 @@
             }
         });
     }
-
 
 </script>
 <body>
@@ -106,11 +103,6 @@
                                 <select id="date_select" name="date_select" size="10" class="selectpicker form-control">
 
                                 </select>
-                                <!--                                <select size="10" name="date_select" id="date_select" class="selectpicker form-control">-->
-                                <!--                                    {% for date in dates %}-->
-                                <!--                                    <option value="{{ date }}">{{ date.strftime('%Y-%m-%d, %H:%M') }}</option>-->
-                                <!--                                    {% endfor %}-->
-                                <!--                                </select>-->
                             </div>
                             <br/>
                             <button type="submit" class="btn btn-default">Go</button>
@@ -154,7 +146,6 @@
                     <br/>
                     <input type="submit" value="View Results"/>
                 </form>
-
             </div>
             <div class="col-md-12"><br/>Click <span><a href="{{ url_for('profile')}}">here</a></span> to go back</div>
             {% endif %}
