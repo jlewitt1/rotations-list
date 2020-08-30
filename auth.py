@@ -36,7 +36,7 @@ def signup_post():
     email = request.form.get('email')
     first_name = request.form.get('first_name')
     last_name = request.form.get('last_name')
-    graduating_year = request.form.get('year')
+    graduating_year = int(request.form.get('year'))
     organization = request.form.get('organization')
     if organization == '':
         organization = DEFAULT_SCHOOL
