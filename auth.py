@@ -36,6 +36,7 @@ def signup_post():
     email = request.form.get('email')
     first_name = request.form.get('first_name')
     last_name = request.form.get('last_name')
+    graduating_year = request.form.get('year')
     organization = request.form.get('organization')
     if organization == '':
         organization = DEFAULT_SCHOOL
@@ -50,7 +51,7 @@ def signup_post():
 
     # create a new user with the form data. Hash the password so the plaintext version isn't saved.
     new_user = models.User(email=email, first_name=first_name, last_name=last_name, organization=organization,
-                           password=generate_password_hash(password, method='sha256'))
+                           password=generate_password_hash(password, method='sha256'), graduating_year=graduating_year)
 
     # add the new user to the database
     db.session.add(new_user)

@@ -9,14 +9,14 @@
 </head>
 <body>
 <script>
-    function getRotationData(rotationSelected, schoolSelected) {
+    function getRotationData(rotationSelected, schoolSelected, yearSelected) {
         // handle retrieval or rotation data based on user selection
         $('#data-href').click(function (event) {
             event.preventDefault();
             $.ajax({
                 type: 'POST',
                 url: '/lottery_participants',
-                data: {"rotation": rotationSelected, "school":schoolSelected},
+                data: {"rotation": rotationSelected, "school": schoolSelected, "year": yearSelected},
                 success: function (allParticipants) {
                     listSelector = $("#listSelector");
                     $.each(allParticipants, function (index, participant) {
@@ -61,6 +61,15 @@
                     </div>
                     <br/>
                     <div class="input-group">
+                        <span class="input-group-addon">Select a Graduation Year</span>
+                        <select name="year_select" id="year-selected" class="selectpicker form-control">
+                            {% for class in graduating_classes %}
+                            <option value="{{ class }}">{{ graduating_classes[loop.index-1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br/>
+                    <div class="input-group">
                         <span class="input-group-addon">Select a rotation</span>
                         <select name="rotation_select" id="rotation-selected" class="selectpicker form-control">
                             {% for rotation in rotation_numbers %}
@@ -70,7 +79,7 @@
                     </div>
                     <br/>
                     <div>Click <span><a id="data-href"
-                                        href="javascript:getRotationData($('#rotation-selected').val(), $('#school-selected').val())">here</a></span>
+                                        href="javascript:getRotationData($('#rotation-selected').val(), $('#school-selected').val(), $('#year-selected').val())">here</a></span>
                         to see all participants and allocations
                     </div>
                     <br/>
@@ -95,6 +104,15 @@
                         <select name="school_select" id="school-selected" class="selectpicker form-control">
                             {% for organization in organizations %}
                             <option value="{{ organization }}">{{ organizations[loop.index-1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <br/>
+                    <div class="input-group">
+                        <span class="input-group-addon">Select a Graduation Year</span>
+                        <select name="year_select" id="year-selected" class="selectpicker form-control">
+                            {% for class in graduating_classes %}
+                            <option value="{{ class }}">{{ graduating_classes[loop.index-1] }}</option>
                             {% endfor %}
                         </select>
                     </div>

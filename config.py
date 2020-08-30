@@ -12,6 +12,7 @@ MAIL_CONFIG = {
 }
 DEFAULT_SCHOOL = 'Ben Gurion'
 ALL_SCHOOLS = [DEFAULT_SCHOOL, 'Sackler', 'Hebrew U', 'Technion']
+GRADUATING_CLASSES = [2022, 2023, 2024, 2025]
 
 
 class Config(object):

@@ -32,12 +32,14 @@ class Overview(db.Model):
     date = db.Column(db.DateTime)
     rotation_number = db.Column(db.Integer)
     organization = db.Column(db.String(1000))
+    graduating_year = db.Column(db.Integer)
 
-    def __init__(self, lottery_id, rotation_number, organization):
+    def __init__(self, lottery_id, rotation_number, organization, graduating_year):
         self.lottery_id = lottery_id
         self.rotation_number = rotation_number
         self.date = datetime.datetime.utcnow().replace(tzinfo=timezone.utc).astimezone(tz=None)
         self.organization = organization
+        self.graduating_year = graduating_year
 
     def __repr__(self):
         return '<id {}>'.format(self.id)
@@ -79,13 +81,15 @@ class User(UserMixin, db.Model):
     first_name = db.Column(db.String(1000))
     last_name = db.Column(db.String(1000))
     organization = db.Column(db.String(1000))
+    graduating_year = db.Column(db.Integer)
 
-    def __init__(self, email, password, first_name, last_name, organization):
+    def __init__(self, email, password, first_name, last_name, organization, graduating_year):
         self.email = email
         self.password = password
         self.first_name = first_name
         self.last_name = last_name
         self.organization = organization
+        self.graduating_year = graduating_year
 
     def __repr__(self):
         return '<id {}>'.format(self.id)

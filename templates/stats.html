@@ -4,9 +4,59 @@
     <title>Lottery Results</title>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <link rel="stylesheet" href="../static/css/main.css"/>
 </head>
 
+<script type="text/javascript">
+    var schoolSelected = {{school_selected | tojson}};
+</script>
+<script>
+
+    function getClassData() {
+        let yearSelected = $('#class_select').find(":selected").text();
+        $.ajax({
+            type: 'POST',
+            url: '/graduating_class',
+            data: {"school": schoolSelected, "year": yearSelected},
+            success: function (res) {
+                let datesRun = res['dates_run'];
+                console.log("datesRun", datesRun)
+                if (datesRun.length > 0) {
+
+                    let rotationsRun = res['rotations_run'];
+                    let rotationNames = res['rotation_names']
+                    console.log("rotationNames", rotationNames)
+                    console.log("rotationsRun", rotationsRun)
+
+                    let datesList = document.getElementById('date_select').options;
+                    let rotationsList = document.getElementById('rotation_select').options;
+
+                    datesRun.forEach(date =>
+                        datesList.add(
+                            new Option(date.split(':')[0] + ":" + date.split(':')[1], date)
+                        )
+                    );
+
+                    rotationsRun.forEach(rotation =>
+                        rotationsList.add(
+                            new Option(rotationNames[rotation - 1], rotation) // text, value
+                        )
+                    );
+                    $("#dates-holder").show();
+                    $("#rotations-holder").show();
+                    $("#no-results-holder").hide()
+                } else {
+                    $("#dates-holder").hide();
+                    $("#rotations-holder").hide();
+                    $("#no-results-holder").show()
+                }
+            }
+        });
+    }
+
+
+</script>
 <body>
 <div id="page-wrapper">
     <!-- Nav -->
@@ -16,7 +66,8 @@
             {% if school_selected %}
             <div class="school-results">
                 {% if dates|length == 0 %}
-                <h4><strong>No Lottery Results for {{ school_selected }}</strong></h4>
+                <h4><strong>No Lottery Results for <span id="school_selected">{{ school_selected }}</span></strong>
+                </h4>
                 <br/>
                 <h5>Check another school for past lottery results</h5>
                 <div class="col-md-12"><br/>Click <span><a href="{{ url_for('stats')}}">here</a></span> to try a
@@ -25,27 +76,48 @@
                 {% else %}
                 <h4><strong>Past Lottery Results for {{ school_selected }}</strong></h4>
                 <br/>
-                <h3>There have been <b>{{dates|length}}</b> lotteries across <b>{{rotations|length}}</b> rotations</h3>
-                <br/>
+                <div>Please select a graduating class:</div>
                 <div class="col-md-6" style="width:50%">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <select name="class_select" id="class_select" class="selectpicker form-control"
+                                    style="background: transparent; width: 20%; padding-left: 1%; border-radius: 10px">
+                                {% for class in graduating_classes %}
+                                    <option value="{{ class }}">{{ graduating_classes[loop.index-1] }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <br/>
+                        <button class="btn btn-default" onclick="getClassData()">Go</button>
+                    </div>
+                </div>
+                <br/>
+                <div class="col-md-6" id="no-results-holder" style="width:50%; display: none">
+                    <div>No results found - try another year</div>
+                </div>
+                <div class="col-md-6" id="dates-holder" style="width:50%; display: none">
+                    <br/>
                     <h4>Filter by date run:</h4>
                     <br/>
                     <form class="form-inline" method="POST" action="{{ url_for('dates') }}">
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon">Select a date</span>
-                                <select size="10" name="date_select" class="selectpicker form-control">
-                                    {% for date in dates %}
-                                    <option value="{{ date }}">{{ date.strftime('%Y-%m-%d, %H:%M') }}</option>
-                                    {% endfor %}
+                                <select id="date_select" name="date_select" size="10" class="selectpicker form-control">
+
                                 </select>
+                                <!--                                <select size="10" name="date_select" id="date_select" class="selectpicker form-control">-->
+                                <!--                                    {% for date in dates %}-->
+                                <!--                                    <option value="{{ date }}">{{ date.strftime('%Y-%m-%d, %H:%M') }}</option>-->
+                                <!--                                    {% endfor %}-->
+                                <!--                                </select>-->
                             </div>
                             <br/>
                             <button type="submit" class="btn btn-default">Go</button>
                         </div>
                     </form>
                 </div>
-                <div class="col-md-6" style="width: 50%">
+                <div class="col-md-6" id="rotations-holder" style="width: 50%; display:none">
                     <br/>
                     <h4>Filter by rotation:</h4>
                     <br/>
@@ -53,10 +125,7 @@
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon">Select a rotation</span>
-                                <select name="rotation_select" class="selectpicker form-control">
-                                    {% for rotation in rotations %}
-                                    <option value="{{ rotation }}">{{ rotation_names[rotation-1] }}</option>
-                                    {% endfor %}
+                                <select name="rotation_select" id="rotation_select" class="selectpicker form-control">
                                 </select>
                             </div>
                             <br/>

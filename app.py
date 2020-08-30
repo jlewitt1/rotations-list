@@ -1,5 +1,6 @@
 import uuid
 import os
+import datetime
 import logging
 from flask import Flask, jsonify, request, render_template, Blueprint, flash, redirect, url_for
 from flask_admin.babel import gettext
@@ -8,7 +9,8 @@ from flask_admin import Admin, BaseView, expose, AdminIndexView
 from flask_admin.contrib.sqla import ModelView
 from flask_mail import Mail
 from flask_sqlalchemy import SQLAlchemy
-from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG, ROTATION_NAMES, MAX_SUBMISSIONS, ALL_SCHOOLS
+from config import ROTATION_NUMBERS, MAX_ALLOCATION_POINTS, MAIL_CONFIG, ROTATION_NAMES, MAX_SUBMISSIONS, ALL_SCHOOLS, \
+    GRADUATING_CLASSES
 
 logging = logging.getLogger(__name__)
 app = Flask(__name__)
@@ -36,14 +38,14 @@ class MyView(BaseView):
     @expose('/')
     def index(self):
         return self.render('admin.html', rotation_numbers=ROTATION_NUMBERS, rotation_names=ROTATION_NAMES,
-                           organizations=ALL_SCHOOLS)
+                           organizations=ALL_SCHOOLS, graduating_classes=GRADUATING_CLASSES)
 
 
 class UserModelView(ModelView):
     can_edit = False
-    column_list = ('first_name', 'last_name', 'email', 'organization')
+    column_list = ('first_name', 'last_name', 'email', 'organization', 'graduating_year')
     column_labels = dict(first_name='First Name', last_name='Last Name', email='Email',
-                         organization='Medical School')
+                         organization='Medical School', graduating_year='Graduation Year')
 
     def is_accessible(self):
         return current_user.is_authenticated
@@ -150,13 +152,15 @@ def results():
             file_received = request.files['file']
             rotation_number = int(request.form.get('rotation_select'))
             school_selected = request.form.get('school_select')
+            year_selected = request.form.get('year_select')
             names, points, final_names_order = utils.generate_final_lottery_order_for_rotation(rotation_number,
                                                                                                school_selected,
+                                                                                               year_selected,
                                                                                                from_file=file_received)
             lottery_id = str(uuid.uuid4())
             utils.save_lottery_drawing_results_in_database(names, points, final_names_order, lottery_id)
             utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number,
-                                                         school_selected=school_selected)
+                                                         school_selected=school_selected, year_selected=year_selected)
             return render_template('results.html', names=final_names_order, all_data={"names": names,
                                                                                       "weights": points})
         except Exception as e:
@@ -172,16 +176,18 @@ def admin_lottery():
             lottery_id = str(uuid.uuid4())
             rotation_number = int(request.form.get('rotation_select'))
             school_selected = request.form.get('school_select')
+            year_selected = request.form.get('year_select')
             names, points, final_names_order = utils.generate_final_lottery_order_for_rotation(rotation_number,
                                                                                                school_selected,
+                                                                                               year_selected,
                                                                                                from_file=False)
             utils.save_lottery_drawing_results_in_database(names, points, final_names_order, lottery_id)
             utils.save_lottery_overview_info_in_database(lottery_id, rotation_number=rotation_number,
-                                                         school_selected=school_selected)
-            dates_run, rotations_run = utils.generate_data_for_stats_page(school_selected)
+                                                         school_selected=school_selected, year_selected=year_selected)
+            dates_run, rotations_run = utils.generate_data_for_stats_page(school_selected, year_selected)
             return render_template('stats.html', dates=dates_run, rotations=rotations_run,
                                    rotation_names=ROTATION_NAMES, school_selected=school_selected,
-                                   organizations=ALL_SCHOOLS)
+                                   organizations=ALL_SCHOOLS, graduating_classes=GRADUATING_CLASSES)
         except Exception as e:
             logging.error(f"Unable to save data in table: {e}")
             return render_template('error.html', error=str(e))
@@ -200,24 +206,46 @@ def lottery():
             return render_template('results.html', names=final_names_order, all_data={"names": names,
                                                                                       "weights": points})
         except Exception as e:
-            print(f"Unable to save data in table: {e}")
+            logging.error(f"Unable to save data in table: {e}")
             return render_template('error.html', error=str(e))
 
 
 @app.route('/stats')
 def stats():
     """main stats page showing all dates for lotteries run and all rotations represented"""
-    dates_run, rotations_run = utils.generate_data_for_stats_page(school_selected=None)
-    return render_template('stats.html', dates=dates_run, rotations=rotations_run, rotation_names=ROTATION_NAMES,
-                           school_selected=None, organizations=ALL_SCHOOLS)
+    try:
+        dates_run, rotations_run = utils.generate_data_for_stats_page(school_selected=None, year_selected=None)
+        return render_template('stats.html', dates=dates_run, rotations=rotations_run, rotation_names=ROTATION_NAMES,
+                               school_selected=None, organizations=ALL_SCHOOLS, graduating_classes=GRADUATING_CLASSES)
+    except Exception as e:
+        logging.error(f"Unable to generate stats table: {e}")
+        return render_template('error.html', error=str(e))
 
 
 @app.route('/school_results', methods=['POST'])
 def school_results():
-    school_selected = request.form.get('school_select')
-    dates_run, rotations_run = utils.generate_data_for_stats_page(school_selected)
-    return render_template('stats.html', dates=dates_run, rotations=rotations_run, rotation_names=ROTATION_NAMES,
-                           school_selected=school_selected, organizations=ALL_SCHOOLS)
+    try:
+        school_selected = request.form.get('school_select')
+        dates_run, rotations_run = utils.generate_data_for_stats_page(school_selected, year_selected=None)
+        return render_template('stats.html', dates=dates_run, rotations=rotations_run, rotation_names=ROTATION_NAMES,
+                               school_selected=school_selected, organizations=ALL_SCHOOLS,
+                               graduating_classes=GRADUATING_CLASSES)
+    except Exception as e:
+        logging.error(f"Unable to generate school_results: {e}")
+        return render_template('error.html', error=str(e))
+
+
+@app.route('/graduating_class', methods=['POST'])
+def graduating_class():
+    try:
+        year_selected = int(request.form['year'])
+        school_selected = request.form['school']
+        dates_run, rotations_run = utils.generate_data_for_stats_page(school_selected, year_selected)
+        return {"dates_run": [str(date) for date in dates_run], "rotations_run": rotations_run,
+                "rotation_names": ROTATION_NAMES}
+    except Exception as e:
+        logging.error(f"Unable to generate graduating_class: {e}")
+        return render_template('error.html', error=str(e))
 
 
 @app.route('/lottery_participants', methods=['POST'])
@@ -225,7 +253,8 @@ def lottery_participants():
     """retrieves the participants and allocations for a given rotation"""
     rotation_number = int(request.form['rotation'])
     school_selected = request.form['school']
-    df = utils.build_dataframe_for_given_rotation(rotation_number, school_selected)
+    year_selected = request.form['year']
+    df = utils.build_dataframe_for_given_rotation(rotation_number, school_selected, year_selected)
     if df.empty:
         return f"Currently no participants for rotation {rotation_number} in {school_selected}"
     # if there is data for given rotation
@@ -235,28 +264,39 @@ def lottery_participants():
 @app.route("/dates", methods=['GET', 'POST'])
 def dates():
     """show the complete lottery results based on a given datetime selected"""
-    date_selected = request.form.get('date_select')
-    lottery_id = db.session.query(models.Overview).filter_by(date=date_selected).first().lottery_id
-    data_for_date_selected = db.session.query(models.Result).filter_by(lottery_id=lottery_id)
-    df = utils.build_final_dataframe_for_page(data_for_date_selected)
-    return render_template('dates.html', date=":".join(date_selected.split(":")[:-1]), all_data=df)
+    try:
+        date_selected_str = request.form.get('date_select')
+        date_selected = datetime.datetime.strptime(date_selected_str, '%Y-%m-%d %H:%M:%S.%f')
+        lottery_id = db.session.query(models.Overview).filter_by(date=date_selected).first().lottery_id
+        data_for_date_selected = db.session.query(models.Result).filter_by(lottery_id=lottery_id)
+        df = utils.build_final_dataframe_for_page(data_for_date_selected)
+        return render_template('dates.html', date=utils.format_str_date(date_selected_str), all_data=df)
+
+    except Exception as e:
+        logging.error(f"Unable to generate dates: {e}")
+        return render_template('error.html', error=str(e))
 
 
 @app.route("/rotations", methods=['GET', 'POST'])
 def rotations():
     """show the results of a fake lottery run by a registered user"""
-    rotation_selected = request.form.get('rotation_select')
-    data_for_rotation_selected = db.session.query(models.Overview).filter_by(rotation_number=int(rotation_selected))
-    all_dates_for_rotation = [data.date for data in data_for_rotation_selected]
-    all_lottery_ids_for_rotation = [data.lottery_id for data in data_for_rotation_selected]
-    # get winner for given date and lottery id
-    all_winners = []
-    for idx, date in enumerate(all_dates_for_rotation):
-        winner_name = models.Result.query.filter_by(lottery_id=all_lottery_ids_for_rotation[idx]).order_by(
-            models.Result.final_ranking.asc()).first().name
-        all_winners.append(winner_name)
-    return render_template('rotations.html', all_dates=all_dates_for_rotation[::-1], all_winners=all_winners[::-1],
-                           rotation_name=ROTATION_NAMES[int(rotation_selected) - 1])
+    try:
+        rotation_selected = request.form.get('rotation_select')
+        data_for_rotation_selected = db.session.query(models.Overview).filter_by(rotation_number=int(rotation_selected))
+        all_dates_for_rotation = [data.date for data in data_for_rotation_selected]
+        all_lottery_ids_for_rotation = [data.lottery_id for data in data_for_rotation_selected]
+        # get winner for given date and lottery id
+        all_winners = []
+        for idx, date in enumerate(all_dates_for_rotation):
+            winner_name = models.Result.query.filter_by(lottery_id=all_lottery_ids_for_rotation[idx]).order_by(
+                models.Result.final_ranking.asc()).first().name
+            all_winners.append(winner_name)
+        return render_template('rotations.html', all_dates=all_dates_for_rotation[::-1], all_winners=all_winners[::-1],
+                               rotation_name=ROTATION_NAMES[int(rotation_selected) - 1])
+
+    except Exception as e:
+        logging.error(f"Unable to generate rotations: {e}")
+        return render_template('error.html', error=str(e))
 
 
 @login_required
@@ -288,12 +328,15 @@ def index():
 
 @app.route('/profile')
 def profile():
-    points_results, num_submissions = utils.get_current_point_totals_for_user(current_user.email)
-    return render_template('profile.html', name=current_user.first_name, email=current_user.email,
-                           max_points=MAX_ALLOCATION_POINTS, rotations=ROTATION_NUMBERS,
-                           points_results=points_results, rotation_names=ROTATION_NAMES,
-                           num_submissions_remaining=MAX_SUBMISSIONS - num_submissions)
-
+    try:
+        points_results, num_submissions = utils.get_current_point_totals_for_user(current_user.email)
+        return render_template('profile.html', name=current_user.first_name, email=current_user.email,
+                               max_points=MAX_ALLOCATION_POINTS, rotations=ROTATION_NUMBERS,
+                               points_results=points_results, rotation_names=ROTATION_NAMES,
+                               num_submissions_remaining=MAX_SUBMISSIONS - num_submissions)
+    except Exception as e:
+        logging.error(f"Unable to generate profile: {e}")
+        return render_template('error.html', error=str(e))
 
 @login_manager.user_loader
 def load_user(user_id):
