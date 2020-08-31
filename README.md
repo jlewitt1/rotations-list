@@ -9,22 +9,22 @@ http://rotations-lottery.herokuapp.com/
 
 ## Screenshots
 Home Screen
-![Home Screen](./static/screenshots/main1.png?raw=true "Home Screen")
+![Home Screen](./static/screenshots/main1.PNG?raw=true "Home Screen")
 
 Profile Page - used for allocating points across all rotations
-![Profile Screen](./static/screenshots/profile.png?raw=true "Profile Screen")
+![Profile Screen](./static/screenshots/profile.PNG?raw=true "Profile Screen")
 
 Results Page - filter results for school / graduating class by date or rotation name
-![Dates/Rotations Screen](./static/screenshots/results1.png?raw=true "Dates/Rotations Screen")
+![Dates/Rotations Screen](./static/screenshots/results1.PNG?raw=true "Dates/Rotations Screen")
 
 Lottery Results - final lottery order showing name, points allocated, and selection ranking
-![Lottery Results Screen](./static/screenshots/results2.png?raw=true "Lottery Results Screen")
+![Lottery Results Screen](./static/screenshots/results2.PNG?raw=true "Lottery Results Screen")
 
 Admin Home - Manage all users / lottery history / start a new lottery
-![Admin Home Screen](./static/screenshots/admin_home.png?raw=true "Admin Home Screen")
+![Admin Home Screen](./static/screenshots/admin_home.PNG?raw=true "Admin Home Screen")
 
 Launch a new lottery as Admin - based on registered users or an excel file 
-![Admin Lottery Screen](./static/screenshots/admin_lottery.png?raw=true "Admin Lottery Screen")
+![Admin Lottery Screen](./static/screenshots/admin_lottery.PNG?raw=true "Admin Lottery Screen")
 
 ## Stack
 * Flask-SQLAlchemy
