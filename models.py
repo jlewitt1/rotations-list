@@ -82,6 +82,7 @@ class User(UserMixin, db.Model):
     last_name = db.Column(db.String(1000))
     organization = db.Column(db.String(1000))
     graduating_year = db.Column(db.Integer)
+    is_superuser = db.Column(db.Boolean, default=False)
 
     def __init__(self, email, password, first_name, last_name, organization, graduating_year):
         self.email = email

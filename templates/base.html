@@ -19,40 +19,39 @@
                     </a>
                 </li>
                 {% if current_user.is_authenticated %}
-                <li>
-                    <a href="{{ url_for('main.profile') }}" class="icon solid fa-user-friends">
-                        <span>Profile</span>
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{ url_for('main.profile') }}" class="icon solid fa-user-friends">
+                            <span>Profile</span>
+                        </a>
+                    </li>
                 {% endif %}
-                {% if current_user.is_authenticated %}
-
-                <li>
-                    <a href="{{ url_for('admin.index') }}" class="icon solid fa-user-shield">
-                        <span>Admin</span>
-                    </a>
-                </li>
-                {% endif %}
-                {% if not current_user.is_authenticated %}
-                <li>
-                    <a href="{{ url_for('auth.login') }}" class="icon solid fa-sign-in-alt">
-                        <span>Login</span>
-                    </a>
-                </li>
+                {% if ( (current_user.is_authenticated) and (current_user.is_superuser) ) %}
+                    <li>
+                        <a href="{{ url_for('admin.index') }}" class="icon solid fa-user-shield">
+                            <span>Admin</span>
+                        </a>
+                    </li>
                 {% endif %}
                 {% if not current_user.is_authenticated %}
-                <li>
-                    <a href="{{ url_for('auth.signup') }}" class="icon solid fa-user-plus">
-                        <span>Sign Up</span>
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{ url_for('auth.login') }}" class="icon solid fa-sign-in-alt">
+                            <span>Login</span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if not current_user.is_authenticated %}
+                    <li>
+                        <a href="{{ url_for('auth.signup') }}" class="icon solid fa-user-plus">
+                            <span>Sign Up</span>
+                        </a>
+                    </li>
                 {% endif %}
                 {% if current_user.is_authenticated %}
-                <li>
-                    <a href="{{ url_for('auth.logout') }}" class="icon solid fa-sign-out-alt">
-                        <span>Logout</span>
-                    </a>
-                </li>
+                    <li>
+                        <a href="{{ url_for('auth.logout') }}" class="icon solid fa-sign-out-alt">
+                            <span>Logout</span>
+                        </a>
+                    </li>
                 {% endif %}
 
             </ul>

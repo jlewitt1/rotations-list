@@ -33,7 +33,7 @@ import emails
 # initialize custom views for admin panel
 class MyView(BaseView):
     def is_accessible(self):
-        return current_user.is_authenticated
+        return current_user.is_authenticated and current_user.is_superuser
 
     @expose('/')
     def index(self):
@@ -42,13 +42,17 @@ class MyView(BaseView):
 
 
 class UserModelView(ModelView):
-    can_edit = False
-    column_list = ('first_name', 'last_name', 'email', 'organization', 'graduating_year')
+    column_editable_list = ('graduating_year', 'is_superuser')
+    form_widget_args = {
+        'organization': {'readonly': True}, 'first_name': {'readonly': True}, 'last_name': {'readonly': True},
+        'email': {'readonly': True}, 'password': {'readonly': True}
+    }
+    column_list = ('first_name', 'last_name', 'email', 'organization', 'graduating_year', 'is_superuser')
     column_labels = dict(first_name='First Name', last_name='Last Name', email='Email',
-                         organization='Medical School', graduating_year='Graduation Year')
+                         organization='Medical School', graduating_year='Graduation Year', is_superuser='Superuser')
 
     def is_accessible(self):
-        return current_user.is_authenticated
+        return current_user.is_authenticated and current_user.is_superuser
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('auth.login'))
@@ -82,7 +86,7 @@ class PointsModelView(ModelView):
                          points_four=ROTATION_NAMES[3], points_five=ROTATION_NAMES[4], points_six=ROTATION_NAMES[5])
 
     def is_accessible(self):
-        return current_user.is_authenticated
+        return current_user.is_authenticated and current_user.is_superuser
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('auth.login'))
@@ -95,7 +99,7 @@ class OverviewModelView(ModelView):
     column_labels = dict(date='Date', rotation_number='Rotation Number', organization='School Name')
 
     def is_accessible(self):
-        return current_user.is_authenticated
+        return current_user.is_authenticated and current_user.is_superuser
 
     def inaccessible_callback(self, name, **kwargs):
         return redirect(url_for('auth.login'))
@@ -123,7 +127,7 @@ class OverviewModelView(ModelView):
 
 class MyAdminIndexView(AdminIndexView):
     def is_accessible(self):
-        return current_user.is_authenticated
+        return current_user.is_authenticated and current_user.is_superuser
 
 
 from auth import auth as auth_blueprint
@@ -281,19 +285,24 @@ def dates():
 def rotations():
     """show the results of a fake lottery run by a registered user"""
     try:
-        rotation_selected = request.form.get('rotation_select')
-        data_for_rotation_selected = db.session.query(models.Overview).filter_by(rotation_number=int(rotation_selected))
+        rotation_selected = request.form['rotation']
+        school_selected = request.form['school']
+        data_for_rotation_selected = db.session.query(models.Overview).filter_by(rotation_number=int(rotation_selected),
+                                                                                 organization=school_selected)
         all_dates_for_rotation = [data.date for data in data_for_rotation_selected]
         all_lottery_ids_for_rotation = [data.lottery_id for data in data_for_rotation_selected]
         # get winner for given date and lottery id
         all_winners = []
         for idx, date in enumerate(all_dates_for_rotation):
-            winner_name = models.Result.query.filter_by(lottery_id=all_lottery_ids_for_rotation[idx]).order_by(
-                models.Result.final_ranking.asc()).first().name
-            all_winners.append(winner_name)
+            try:
+                winner_name = models.Result.query.filter_by(lottery_id=all_lottery_ids_for_rotation[idx]).order_by(
+                    models.Result.final_ranking.asc()).first().name
+                all_winners.append(winner_name)
+            except Exception as e:
+                del all_dates_for_rotation[idx]
+                logging.error(f'Unable to find winner: {str(e)}')
         return render_template('rotations.html', all_dates=all_dates_for_rotation[::-1], all_winners=all_winners[::-1],
                                rotation_name=ROTATION_NAMES[int(rotation_selected) - 1])
-
     except Exception as e:
         logging.error(f"Unable to generate rotations: {e}")
         return render_template('error.html', error=str(e))
@@ -338,6 +347,7 @@ def profile():
         logging.error(f"Unable to generate profile: {e}")
         return render_template('error.html', error=str(e))
 
+
 @login_manager.user_loader
 def load_user(user_id):
     # since the user_id is just the primary key of our user table, use it in the query for the user
@@ -348,6 +358,16 @@ def load_user(user_id):
 def shutdown_session(exception=None):
     """automatically close all unused/hanging connections and prevent bottleneck"""
     db.session.remove()
+
+
+@app.errorhandler(403)
+def page_not_found(e):
+    return render_template('errors/403.html'), 403
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('errors/404.html'), 404
 
 
 if __name__ == '__main__':

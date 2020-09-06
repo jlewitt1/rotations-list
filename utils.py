@@ -2,6 +2,7 @@ import numpy as np
 from numpy.random import choice
 import pandas as pd
 import models
+from sqlalchemy import desc
 from app import db
 import logging
 
@@ -160,13 +161,15 @@ def get_current_point_totals_for_user(user_email):
 
 def generate_data_for_stats_page(school_selected, year_selected):
     if year_selected is None:
-        results_list = db.session.query(models.Overview).filter_by(organization=school_selected).all()
+        results_list = db.session.query(models.Overview).filter_by(organization=school_selected).order_by(
+            desc('date')).all()
     else:
         results_list = db.session.query(models.Overview).filter_by(organization=school_selected,
-                                                                   graduating_year=year_selected).all()
+                                                                   graduating_year=year_selected).order_by(
+            desc('date')).all()
     dates_run = [result.date for result in results_list]
     rotations_run = list(set([result.rotation_number for result in results_list]))
-    return dates_run[::-1], rotations_run
+    return dates_run, rotations_run
 
 
 def generate_final_lottery_order_for_rotation(rotation_number, school_selected, year_selected, from_file):

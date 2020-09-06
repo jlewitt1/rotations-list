@@ -42,7 +42,7 @@
                         )
                     );
                     $("#dates-holder").show();
-                    $("#rotations-holder").show();
+                    {#$("#rotations-holder").show();#}
                     $("#no-results-holder").hide()
                 } else {
                     $("#dates-holder").hide();
@@ -53,6 +53,21 @@
         });
     }
 
+    function getRotationsData() {
+        let rotationSelected = $('#rotation_select').find(":selected").val();
+        console.log("sending rotation data")
+        console.log("rotationSelected:", rotationSelected)
+        console.log("schoolSelected:", schoolSelected)
+        $.ajax({
+            type: 'POST',
+            url: '/rotations',
+            data: {"school": schoolSelected, "rotation": rotationSelected},
+            success: function (res) {
+                console.log("res", res)
+                window.location.href = "rotations_results";
+            }
+        })
+    }
 </script>
 <body>
 <div id="page-wrapper">
@@ -113,7 +128,7 @@
                     <br/>
                     <h4>Filter by rotation:</h4>
                     <br/>
-                    <form class="form-inline" method="POST" action="{{ url_for('rotations') }}">
+{#                    <form class="form-inline" method="POST" action="{{ url_for('rotations') }}">#}
                         <div class="form-group">
                             <div class="input-group">
                                 <span class="input-group-addon">Select a rotation</span>
@@ -121,9 +136,9 @@
                                 </select>
                             </div>
                             <br/>
-                            <button type="submit" class="btn btn-default">Go</button>
+                            <button type="submit" class="btn btn-default" onclick="getRotationsData()">Go</button>
                         </div>
-                    </form>
+{#                    </form>#}
                 </div>
                 <br/>
                 <div class="col-md-12"><br/>Click <span><a href="{{ url_for('stats')}}">here</a></span> to go back
