@@ -34,8 +34,8 @@ def login_post():
 @auth.route('/signup', methods=['POST'])
 def signup_post():
     email = request.form.get('email')
-    first_name = request.form.get('first_name')
-    last_name = request.form.get('last_name')
+    first_name = request.form.get('first_name').capitalize()
+    last_name = request.form.get('last_name').capitalize()
     graduating_year = int(request.form.get('year'))
     organization = request.form.get('organization')
     if organization == '':

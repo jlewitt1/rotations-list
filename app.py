@@ -95,8 +95,9 @@ class PointsModelView(ModelView):
 class OverviewModelView(ModelView):
     can_create = False
     can_edit = False
-    column_list = ('date', 'rotation_number', 'organization')
-    column_labels = dict(date='Date', rotation_number='Rotation Number', organization='School Name')
+    column_list = ('date', 'rotation_number', 'organization', 'graduating_year')
+    column_labels = dict(date='Date', rotation_number='Rotation Number', organization='School Name',
+                         graduating_year='Graduation Year')
 
     def is_accessible(self):
         return current_user.is_authenticated and current_user.is_superuser
